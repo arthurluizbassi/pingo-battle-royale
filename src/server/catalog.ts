@@ -1,9 +1,8 @@
 import "server-only";
-import { createHash } from "node:crypto";
 import { ALL_ITEMS } from "@/content/items";
+import { CATALOG_HASH, catalogRows } from "@/lib/catalog-rows";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-const CATALOG_HASH = createHash("sha1").update(JSON.stringify(ALL_ITEMS)).digest("hex");
 let syncedThisProcess = false;
 
 /**
@@ -16,22 +15,12 @@ export async function syncCatalogIfNeeded(): Promise<void> {
   const admin = createAdminClient();
   const { data: meta } = await admin.from("app_meta").select("value").eq("key", "catalog_hash").maybeSingle();
   if (meta?.value !== CATALOG_HASH) {
-    const rows = ALL_ITEMS.map((item) => ({
-      id: item.id,
-      category: item.category,
-      name: item.name,
-      tier: item.tier,
-      price: item.price,
-      data: item,
-      active: true,
-      updated_at: new Date().toISOString(),
-    }));
-    const { error } = await admin.from("items").upsert(rows);
+    const { error } = await admin.from("items").upsert(catalogRows());
     if (error) throw new Error(`Catalog sync failed: ${error.message}`);
 
     // items removed from code stay in the DB (history/inventories) but can't be sold anymore
-    const ids = ALL_ITEMS.map((i) => i.id);
-    await admin.from("items").update({ active: false }).not("id", "in", `(${ids.map((id) => `"${id}"`).join(",")})`);
+    const ids = ALL_ITEMS.map((i) => `"${i.id}"`).join(",");
+    await admin.from("items").update({ active: false }).not("id", "in", `(${ids})`);
     await admin.from("app_meta").upsert({ key: "catalog_hash", value: CATALOG_HASH, updated_at: new Date().toISOString() });
   }
   syncedThisProcess = true;

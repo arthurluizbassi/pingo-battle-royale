@@ -4,12 +4,12 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { GAME } from "@/config/game";
 import { getItem } from "@/content/items";
-import type { ClassRow, RotationRow } from "@/lib/db-types";
+import type { BattleRow, ClassRow, ParticipantSnapshot, RotationRow } from "@/lib/db-types";
 import { generateTempPassword } from "@/lib/passwords";
 import { computeRanking } from "@/lib/ranking";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { assertTeacher, usernameToEmail, type Session } from "../auth";
-import { lockBattle, startBattle } from "../battles";
+import { loadBattleEvents, lockBattle, startBattle, verifyBattle } from "../battles";
 import { createRotation } from "../shop";
 import { runAction, type ActionResult } from "./result";
 
@@ -372,6 +372,26 @@ export async function startBattleAction(battleId: string): Promise<ActionResult>
     await startBattle(uuid.parse(battleId), session.profile.class_id);
     revalidatePath("/", "layout");
     return "Batalha simulada! Abra a Arena para assistir.";
+  });
+}
+
+/** Re-simulates a finished battle from seed + snapshots and compares with the stored log. */
+export async function verifyReplay(battleId: string): Promise<ActionResult> {
+  return runAction(async () => {
+    const session = await assertTeacher();
+    const admin = createAdminClient();
+    const { data: battle } = await admin
+      .from("battles")
+      .select("*")
+      .eq("id", uuid.parse(battleId))
+      .eq("class_id", session.profile.class_id)
+      .single<BattleRow>();
+    if (!battle || battle.status !== "finished") throw new Error("A batalha ainda não terminou.");
+    const { data: rows } = await admin.from("battle_participants").select("snapshot").eq("battle_id", battleId);
+    const snapshots = (rows ?? []).map((r) => r.snapshot as ParticipantSnapshot).filter(Boolean);
+    const { identical } = await verifyBattle(battle, snapshots, await loadBattleEvents(battleId));
+    if (!identical) throw new Error("A simulação refeita NÃO bate com o registro salvo. Verifique a versão do motor.");
+    return `Reproduzida com sucesso: seed ${battle.seed} gera exatamente a mesma batalha (${battle.engine_version}).`;
   });
 }
 

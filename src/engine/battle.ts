@@ -48,7 +48,6 @@ export function simulateBattle(
   const rng = createRng(input.seed);
   const events: BattleEvent[] = [];
   const fighters = input.participants.map((p) => createFighter(p, config, rng));
-  const byId = new Map(fighters.map((f) => [f.id, f]));
   placeFighters(fighters, config, rng);
 
   for (const f of fighters) {

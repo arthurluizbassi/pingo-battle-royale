@@ -44,3 +44,4 @@ next-env.d.ts
 /sprite-preview
 .seed-credentials.local.txt
 
+!.env.example

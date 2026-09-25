@@ -3,6 +3,8 @@ import { SetupNotice } from "@/components/ui/SetupNotice";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { LoginForm } from "./LoginForm";
 
+export const dynamic = "force-dynamic";
+
 export default function LoginPage() {
   if (!isSupabaseConfigured()) return <SetupNotice />;
   return (
