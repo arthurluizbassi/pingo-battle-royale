@@ -27,6 +27,16 @@ export const GAME = {
     rotationDays: 7,
   },
 
+  /**
+   * Season ranking. Winning gives glory (points, trophies, badges) — NEVER coins or stats,
+   * so last week's champion is not automatically stronger this week.
+   */
+  season: {
+    pointsByPlacement: [10, 7, 5, 4, 3],
+    participationPoints: 1,
+    pointsPerKill: 1,
+  },
+
   /** Students log in with a username; Supabase Auth needs an e-mail, so we derive one. */
   auth: {
     usernameEmailDomain: "alunos.pingo.local",

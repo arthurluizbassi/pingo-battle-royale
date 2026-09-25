@@ -1,0 +1,2 @@
+-- Intentionally empty.
+-- Demo data needs Supabase Auth users, so it is created by `npm run seed` (scripts/seed.ts).
