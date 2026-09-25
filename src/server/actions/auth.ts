@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import type { ProfileRow } from "@/lib/db-types";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { getSession, usernameToEmail } from "../auth";
@@ -20,19 +21,24 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   if (!parsed.success) return { error: "Preencha usuário e senha." };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email: usernameToEmail(parsed.data.username),
     password: parsed.data.password,
   });
-  if (error) return { error: "Usuário ou senha incorretos." };
+  if (error || !data.user) return { error: "Usuário ou senha incorretos." };
 
-  const session = await getSession();
-  if (!session) {
+  // same client: it already holds the new session (cookies of this request may not)
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, active, must_change_password")
+    .eq("id", data.user.id)
+    .maybeSingle<Pick<ProfileRow, "role" | "active" | "must_change_password">>();
+  if (!profile || !profile.active) {
     await supabase.auth.signOut();
-    return { error: "Conta desativada. Fale com o professor." };
+    return { error: "Conta desativada ou sem perfil. Fale com o professor." };
   }
-  if (session.profile.must_change_password) redirect("/trocar-senha");
-  redirect(session.profile.role === "teacher" ? "/professor" : "/pingo");
+  if (profile.must_change_password) redirect("/trocar-senha");
+  redirect(profile.role === "teacher" ? "/professor" : "/pingo");
 }
 
 export async function logout(): Promise<void> {

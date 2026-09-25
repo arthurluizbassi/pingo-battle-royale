@@ -61,8 +61,8 @@ async function main() {
 
     // ---------- anonymous visitor
     await as("anon");
-    check("anônimo não lê carteiras", Number((await one<{ n: string }>("select count(*) n from wallets")).n) === 0);
-    check("anônimo não lê perfis", Number((await one<{ n: string }>("select count(*) n from profiles")).n) === 0);
+    await expectError("anônimo não lê carteiras", "select count(*) from wallets", [], "permission denied");
+    await expectError("anônimo não lê perfis", "select count(*) from profiles", [], "permission denied");
     await expectError("anônimo não chama buy_item", "select buy_item('cardboard_sword')", [], "permission denied");
 
     // ---------- student

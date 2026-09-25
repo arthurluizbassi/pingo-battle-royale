@@ -463,5 +463,10 @@ grant execute on function public.buy_item(text) to authenticated;
 grant execute on function public.equip_item(public.item_category, text) to authenticated;
 grant execute on all functions in schema public to service_role;
 
--- clients never write tables directly (no insert/update/delete policies), but be explicit:
-revoke insert, update, delete, truncate on all tables in schema public from anon, authenticated;
+-- Table privileges, explicit (don't rely on project defaults):
+--   service_role: everything (server only) · authenticated: SELECT (filtered by RLS) · anon: nothing
+grant usage on schema public to anon, authenticated, service_role;
+grant all on all tables in schema public to service_role;
+revoke all on all tables in schema public from anon, authenticated;
+grant select on all tables in schema public to authenticated;
+revoke select on public.app_meta from authenticated;
