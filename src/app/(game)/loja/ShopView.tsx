@@ -6,6 +6,7 @@ import { ItemIcon } from "@/components/pingo/ItemIcon";
 import { ItemDetails, ModifierList } from "@/components/pingo/ItemDetails";
 import { Coins } from "@/components/ui/Coins";
 import { CATEGORY_LABEL, getItem, type ItemCategory, type ItemDefinition, type Loadout } from "@/content/items";
+import { useScrollIntoViewOnMobile } from "@/components/ui/useScrollIntoViewOnMobile";
 import { buyItem, equipItem } from "@/server/actions/student";
 import type { PingoLook } from "@/sprites/compose";
 
@@ -35,6 +36,7 @@ export function ShopView({
   const [feedback, setFeedback] = useState<{ ok: boolean; text: string; itemId?: string } | null>(null);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
+  const detailsRef = useScrollIntoViewOnMobile<HTMLElement>(selected?.id);
 
   const visible = items.filter((i) => tab === "all" || i.category === tab);
 
@@ -133,7 +135,7 @@ export function ShopView({
         </ul>
       </div>
 
-      <aside className="pixel-panel p-4 self-start lg:sticky lg:top-20">
+      <aside ref={detailsRef} className="pixel-panel p-4 self-start lg:sticky lg:top-20 scroll-mt-16">
         {selected ? (
           <ItemDetails item={selected} look={look} loadout={loadout}>
             <div className="flex justify-end">{actionFor(selected)}</div>

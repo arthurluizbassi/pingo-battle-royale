@@ -32,7 +32,9 @@ body {
   font-family: var(--font-nunito), system-ui, sans-serif;
 }
 
-/* ---------------------------------------------------------------- game UI kit */
+/* ---------------------------------------------------------------- game UI kit
+   Inside @layer components so Tailwind utilities (bg-*, text-*) can override them. */
+@layer components {
 .game-bg {
   background-color: var(--color-cream);
   background-image:
@@ -111,6 +113,7 @@ body {
 
 .pixelated {
   image-rendering: pixelated;
+}
 }
 
 /* ---------------------------------------------------------------- Pingo idle animations */

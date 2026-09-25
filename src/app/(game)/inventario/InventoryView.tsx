@@ -16,6 +16,7 @@ import {
   type ItemDefinition,
   type Loadout,
 } from "@/content/items";
+import { useScrollIntoViewOnMobile } from "@/components/ui/useScrollIntoViewOnMobile";
 import { equipItem } from "@/server/actions/student";
 import type { PingoLook } from "@/sprites/compose";
 
@@ -28,6 +29,7 @@ export function InventoryView({ owned, loadout, look }: { owned: string[]; loado
   const [message, setMessage] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
+  const detailsRef = useScrollIntoViewOnMobile<HTMLElement>(selected?.id);
   const stats = buildFromItems(loadoutItems(loadout)).stats;
 
   const setSlot = (slot: ItemCategory, itemId: string | null) =>
@@ -118,7 +120,7 @@ export function InventoryView({ owned, loadout, look }: { owned: string[]; loado
         })}
       </div>
 
-      <aside className="pixel-panel p-4 self-start lg:sticky lg:top-20">
+      <aside ref={detailsRef} className="pixel-panel p-4 self-start lg:sticky lg:top-20 scroll-mt-16">
         {selected ? (
           <ItemDetails item={selected} look={look} loadout={loadout}>
             <div className="flex justify-end gap-2">
