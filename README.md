@@ -78,6 +78,10 @@ npm run dev    # http://localhost:3000
 - Entre como um aluno (ex.: `ana`) → `/pingo`.
 - Páginas de desenvolvimento (sem login): `/dev/sprites` (os 90 itens) e `/dev/arena?seed=27&n=20` (batalha de demonstração).
 
+**Problemas comuns**
+- `npm` não reconhecido no PowerShell: feche e abra o terminal (o Node foi instalado depois que ele foi aberto).
+- "missing required error components, refreshing…" ou erro `ENOENT … .next`: o cache do Next corrompeu (acontece se `npm run build` rodar com o `dev` ligado). Pare o servidor (Ctrl+C), rode `npm run clean` e depois `npm run dev`.
+
 ## 7. Criar o professor (produção)
 
 ```bash

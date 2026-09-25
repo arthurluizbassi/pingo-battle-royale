@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -14,6 +15,7 @@
     "items:report": "tsx scripts/item-report.ts",
     "sprites:base": "tsx scripts/generate-base-sprite.ts",
     "sprites:export": "tsx scripts/export-sprites.ts",
+    "promo": "tsx scripts/render-promo.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:check": "tsx scripts/db-check.ts",
     "db:local:start": "supabase start",
@@ -33,6 +35,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@napi-rs/canvas": "^1.0.9",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.13.6",
     "@types/pg": "^8.23.1",
