@@ -1,0 +1,46 @@
+{
+  "name": "pingo-battle-royale",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "simulate": "tsx scripts/simulate.ts",
+    "items:report": "tsx scripts/item-report.ts",
+    "sprites:base": "tsx scripts/generate-base-sprite.ts",
+    "sprites:export": "tsx scripts/export-sprites.ts",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "seed": "tsx scripts/seed.ts",
+    "create-teacher": "tsx scripts/create-teacher.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.2",
+    "next": "15.5.26",
+    "phaser": "^3.90.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^24.13.6",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.26",
+    "supabase": "^2.118.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.0.2"
+  }
+}
