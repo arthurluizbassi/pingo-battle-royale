@@ -12,6 +12,8 @@ export interface ProfileRow {
   display_name: string;
   role: Role;
   active: boolean;
+  /** signed up with the class code, waiting for the teacher's approval */
+  pending: boolean;
   must_change_password: boolean;
   created_at: string;
 }
@@ -32,6 +34,8 @@ export interface ClassRow {
   shop_rotation_days: number;
   shop_items_per_category: number;
   shop_auto_rotate: boolean;
+  join_code: string | null;
+  join_enabled: boolean;
 }
 
 export type TxType = "activity" | "admin_adjustment" | "purchase" | "special_reward";

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PingoAvatar } from "@/components/pingo/PingoAvatar";
 import { SetupNotice } from "@/components/ui/SetupNotice";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -25,6 +26,12 @@ export default function LoginPage() {
           </h1>
           <p className="text-center text-sm text-muted mt-2 mb-5">Faça as atividades. Equipe seu Pingo. Vença na arena.</p>
           <LoginForm />
+          <p className="text-center text-sm mt-4">
+            Primeira vez?{" "}
+            <Link href="/entrar" className="underline font-bold">
+              Entrar numa turma com código
+            </Link>
+          </p>
         </div>
       </div>
     </main>

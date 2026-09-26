@@ -1,26 +1,50 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { ItemIcon } from "@/components/pingo/ItemIcon";
 import { PingoAvatar } from "@/components/pingo/PingoAvatar";
 import { Card } from "@/components/ui/Card";
 import { Coins } from "@/components/ui/Coins";
 import { getItem } from "@/content/items";
+import type { ClassRow } from "@/lib/db-types";
 import { lookFromPingo } from "@/lib/snapshot";
 import { createClient } from "@/lib/supabase/server";
 import { requireTeacher } from "@/server/auth";
 import { getClassmates } from "@/server/queries";
 import { CreateStudentForm } from "./CreateStudentForm";
+import { JoinCodePanel } from "./JoinCodePanel";
 
 export default async function StudentsPage() {
   const session = await requireTeacher();
-  const students = await getClassmates(session.profile.class_id);
+  const everyone = await getClassmates(session.profile.class_id);
+  const students = everyone.filter((s) => !s.profile.pending);
+  const pending = everyone.filter((s) => s.profile.pending);
   const supabase = await createClient();
-  const { data: wallets } = await supabase.from("wallets").select("owner_id, balance");
+  const [{ data: wallets }, { data: klass }] = await Promise.all([
+    supabase.from("wallets").select("owner_id, balance"),
+    supabase.from("classes").select("*").eq("id", session.profile.class_id).single<ClassRow>(),
+  ]);
   const balance = (id: string) => (wallets ?? []).find((w) => w.owner_id === id)?.balance ?? 0;
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
+  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
 
   return (
     <div className="grid gap-4">
       <h1 className="font-pixel text-3xl">👩‍🎓 Alunos</h1>
-      <Card title="Novo aluno">
+      <Card title="Código da turma (os alunos se cadastram sozinhos)">
+        <JoinCodePanel
+          code={klass?.join_code ?? null}
+          enabled={klass?.join_enabled ?? false}
+          joinUrl={`${proto}://${host}/entrar`}
+          pending={pending.map((p) => ({
+            id: p.profile.id,
+            name: p.profile.display_name,
+            username: p.profile.username,
+            createdAt: p.profile.created_at,
+          }))}
+        />
+      </Card>
+      <Card title="Ou crie um aluno você mesmo">
         <CreateStudentForm />
       </Card>
       <Card title={`Turma (${students.length})`}>

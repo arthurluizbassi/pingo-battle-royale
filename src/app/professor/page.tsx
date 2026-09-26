@@ -21,6 +21,7 @@ export default async function TeacherHome() {
     supabase.from("classes").select("name").eq("id", classId).single(),
   ]);
   const active = (students ?? []).filter((s) => s.active);
+  const pendingCount = (students ?? []).filter((s) => s.pending).length;
   const total = (wallets ?? []).reduce((s, w) => s + (w.balance as number), 0);
   const names = Object.fromEntries((students ?? []).map((s) => [s.id, s.display_name]));
 
@@ -28,6 +29,11 @@ export default async function TeacherHome() {
     <div className="grid gap-4">
       <h1 className="font-pixel text-3xl">Olá, {session.profile.display_name}! 👋</h1>
       <p className="text-muted -mt-2">Turma: {klass?.name}</p>
+      {pendingCount > 0 && (
+        <Link href="/professor/alunos" className="pixel-panel bg-[#fff6c9] px-4 py-3 font-bold hover:-translate-y-0.5 transition-transform">
+          🙋 {pendingCount} {pendingCount === 1 ? "aluno aguardando" : "alunos aguardando"} a sua aprovação →
+        </Link>
+      )}
       <div className="grid gap-3 sm:grid-cols-3">
         <Card title="👩‍🎓 Alunos ativos">
           <p className="font-pixel text-4xl">{active.length}</p>

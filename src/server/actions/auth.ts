@@ -30,9 +30,13 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   // same client: it already holds the new session (cookies of this request may not)
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role, active, must_change_password")
+    .select("role, active, pending, must_change_password")
     .eq("id", data.user.id)
-    .maybeSingle<Pick<ProfileRow, "role" | "active" | "must_change_password">>();
+    .maybeSingle<Pick<ProfileRow, "role" | "active" | "pending" | "must_change_password">>();
+  if (profile?.pending) {
+    await supabase.auth.signOut();
+    return { error: "Seu cadastro está aguardando a aprovação do professor. Tente de novo mais tarde!" };
+  }
   if (!profile || !profile.active) {
     await supabase.auth.signOut();
     return { error: "Conta desativada ou sem perfil. Fale com o professor." };

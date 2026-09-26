@@ -1,10 +1,12 @@
 "use server";
 
+import { randomInt } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { GAME } from "@/config/game";
 import { getItem } from "@/content/items";
 import type { BattleRow, ClassRow, ParticipantSnapshot, RotationRow } from "@/lib/db-types";
+import { generateJoinCode } from "@/lib/join-code";
 import { generateTempPassword } from "@/lib/passwords";
 import { computeRanking } from "@/lib/ranking";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -224,6 +226,81 @@ export async function setManualRotation(itemIds: string[]): Promise<ActionResult
     await createRotation(klass, [], "manual", session.userId, [...new Set(ids)]);
     revalidatePath("/", "layout");
     return "Loja atualizada com a sua seleção.";
+  });
+}
+
+// ------------------------------------------------------------------ class join code
+async function newUniqueJoinCode(): Promise<string> {
+  const admin = createAdminClient();
+  for (let i = 0; i < 10; i++) {
+    const code = generateJoinCode(randomInt);
+    const { data } = await admin.from("classes").select("id").eq("join_code", code).maybeSingle();
+    if (!data) return code;
+  }
+  throw new Error("Não foi possível gerar um código. Tente de novo.");
+}
+
+export async function setJoinEnabled(enabled: boolean): Promise<ActionResult> {
+  return runAction(async () => {
+    const session = await assertTeacher();
+    const klass = await loadClass(session);
+    const update: Partial<ClassRow> = { join_enabled: enabled };
+    if (enabled && !klass.join_code) update.join_code = await newUniqueJoinCode();
+    const { error } = await createAdminClient().from("classes").update(update).eq("id", klass.id);
+    if (error) throw new Error(error.message);
+    revalidatePath("/professor", "layout");
+    return enabled ? "Cadastro por código ligado." : "Cadastro por código desligado.";
+  });
+}
+
+export async function regenerateJoinCode(): Promise<ActionResult> {
+  return runAction(async () => {
+    const session = await assertTeacher();
+    const { error } = await createAdminClient()
+      .from("classes")
+      .update({ join_code: await newUniqueJoinCode() })
+      .eq("id", session.profile.class_id);
+    if (error) throw new Error(error.message);
+    revalidatePath("/professor", "layout");
+    return "Código novo gerado. O antigo parou de funcionar.";
+  });
+}
+
+export async function approveStudents(profileIds: string[]): Promise<ActionResult> {
+  return runAction(async () => {
+    const session = await assertTeacher();
+    const ids = z.array(uuid).min(1).max(200).parse(profileIds);
+    const { data, error } = await createAdminClient()
+      .from("profiles")
+      .update({ pending: false, active: true })
+      .in("id", ids)
+      .eq("class_id", session.profile.class_id)
+      .eq("pending", true)
+      .select("id");
+    if (error) throw new Error(error.message);
+    revalidatePath("/professor", "layout");
+    const n = data?.length ?? 0;
+    return n === 1 ? "Aluno aprovado!" : `${n} alunos aprovados!`;
+  });
+}
+
+export async function rejectStudent(profileId: string): Promise<ActionResult> {
+  return runAction(async () => {
+    const session = await assertTeacher();
+    const admin = createAdminClient();
+    const { data } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("id", uuid.parse(profileId))
+      .eq("class_id", session.profile.class_id)
+      .eq("pending", true)
+      .maybeSingle();
+    if (!data) throw new Error("Pedido não encontrado.");
+    // removes the auth account; profile, wallet and Pingo go with it (on delete cascade)
+    const { error } = await admin.auth.admin.deleteUser(profileId);
+    if (error) throw new Error(error.message);
+    revalidatePath("/professor", "layout");
+    return "Pedido recusado.";
   });
 }
 

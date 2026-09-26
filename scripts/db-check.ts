@@ -143,6 +143,21 @@ async function main() {
     );
     await expectError("professor também não altera saldo pelo navegador", "update wallets set balance = 1", [], "permission denied");
 
+    // ---------- self sign-up: pending students see nothing of the class
+    await as("authenticated", rich.id);
+    await expectError(
+      "aluno não cria contas pelo navegador (setup_profile)",
+      "select setup_profile($1, $2, 'hacker', 'Hacker', 'teacher', 'x', false, false)",
+      [rich.id, rich.class_id],
+      "permission denied",
+    );
+    await as("postgres");
+    await client.query("update profiles set pending = true, active = false where id = $1", [poor.id]);
+    await as("authenticated", poor.id);
+    const seen = Number((await one<{ n: string }>("select count(*) n from profiles")).n);
+    check("aluno pendente só enxerga o próprio perfil", seen === 1, `${seen} perfil(is)`);
+    check("aluno pendente não vê batalhas", Number((await one<{ n: string }>("select count(*) n from battles")).n) === 0);
+
     // ---------- server-only function (service role / postgres)
     await as("postgres");
     await expectError(
