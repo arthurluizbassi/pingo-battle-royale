@@ -16,6 +16,7 @@
     "sprites:base": "tsx scripts/generate-base-sprite.ts",
     "sprites:export": "tsx scripts/export-sprites.ts",
     "promo": "tsx scripts/render-promo.ts",
+    "promo:long": "tsx scripts/render-promo-long.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:check": "tsx scripts/db-check.ts",
     "db:local:start": "supabase start",
