@@ -32,7 +32,7 @@ export default async function TeacherHome() {
         <Card title="👩‍🎓 Alunos ativos">
           <p className="font-pixel text-4xl">{active.length}</p>
         </Card>
-        <Card title="🪙 Moedas em circulação">
+        <Card title="💰 Moedas em circulação">
           <Coins amount={total} size="lg" />
         </Card>
         <Card title="🏆 Temporada">

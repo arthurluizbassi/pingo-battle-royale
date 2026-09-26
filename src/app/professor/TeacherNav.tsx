@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const LINKS = [
   { href: "/professor", label: "Visão geral", icon: "🏠" },
   { href: "/professor/alunos", label: "Alunos", icon: "👩‍🎓" },
-  { href: "/professor/moedas", label: "Moedas", icon: "🪙" },
+  { href: "/professor/moedas", label: "Moedas", icon: "💰" },
   { href: "/professor/loja", label: "Loja e catálogo", icon: "🛒" },
   { href: "/professor/batalhas", label: "Battle Royales", icon: "⚔️" },
   { href: "/professor/temporadas", label: "Temporadas", icon: "🏆" },

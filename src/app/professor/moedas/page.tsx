@@ -24,7 +24,7 @@ export default async function CoinsPage() {
 
   return (
     <div className="grid gap-4">
-      <h1 className="font-pixel text-3xl">🪙 Moedas</h1>
+      <h1 className="font-pixel text-3xl">💰 Moedas</h1>
       <Card title="Distribuir recompensa de atividade">
         <BatchRewardForm
           students={(students ?? []).map((s) => ({
