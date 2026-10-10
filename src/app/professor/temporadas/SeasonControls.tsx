@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Feedback, inputClass } from "@/components/ui/Card";
-import { createSeason, endSeason } from "@/server/actions/teacher";
+import { createSeason, endSeason, resetClassProgress } from "@/server/actions/teacher";
 
 export function SeasonControls({ active, suggestedName }: { active: { id: string; name: string } | null; suggestedName: string }) {
   const [name, setName] = useState(suggestedName);
@@ -49,6 +49,19 @@ export function SeasonControls({ active, suggestedName }: { active: { id: string
           {active ? "Encerrar atual e iniciar nova" : "Iniciar temporada"}
         </button>
       </form>
+      <div className="flex flex-wrap items-center gap-2 border-t-2 border-dashed border-ink/20 pt-3">
+        <button
+          className="pixel-btn btn-small btn-white"
+          disabled={pending}
+          onClick={() =>
+            confirm("Zerar o nível, o XP e os pontos de TODOS os alunos da turma? O histórico de duelos continua.") &&
+            run(() => resetClassProgress())
+          }
+        >
+          Zerar níveis dos duelos
+        </button>
+        <span className="text-xs text-muted">Útil ao começar uma temporada nova: todos voltam ao nível 1.</span>
+      </div>
       <Feedback result={result} />
     </div>
   );

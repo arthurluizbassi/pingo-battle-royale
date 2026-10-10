@@ -2,6 +2,7 @@ import { buildFromItems, getItem, type ItemDefinition } from "@/content/items";
 import { powerScore, type CombatantInput } from "@/engine";
 import type { PingoLook } from "@/sprites/compose";
 import type { ParticipantSnapshot, PingoRow, ProfileRow } from "./db-types";
+import { NEW_PROGRESS, statsWithLevel, type Progress } from "./levels";
 
 export function lookFromPingo(pingo: Pick<PingoRow, "body_color" | "eyes" | "mouth" | "detail"> | null): PingoLook {
   return {
@@ -17,9 +18,12 @@ export function buildSnapshot(
   profile: Pick<ProfileRow, "id" | "username" | "display_name">,
   pingo: PingoRow | null,
   equippedItemIds: string[],
+  progress: Progress = NEW_PROGRESS,
 ): ParticipantSnapshot {
   const items = equippedItemIds.map((id) => getItem(id)).filter((i): i is ItemDefinition => i !== null);
-  const { stats, effects } = buildFromItems(items);
+  const { effects } = buildFromItems(items);
+  // items + level points (from duels), clamped to the caps
+  const stats = statsWithLevel(items.map((i) => i.statModifiers), progress.statPoints);
   return {
     profileId: profile.id,
     username: profile.username,
@@ -37,6 +41,8 @@ export function buildSnapshot(
     stats,
     effects,
     powerScore: powerScore(stats, effects),
+    level: progress.level,
+    statPoints: progress.statPoints,
   };
 }
 

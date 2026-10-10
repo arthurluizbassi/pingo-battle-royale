@@ -30,6 +30,7 @@ export default async function ShopPage() {
           owned={state.inventory}
           loadout={state.loadout}
           look={lookFromPingo(state.pingo)}
+          statPoints={state.progress.statPoints}
         />
       ) : (
         <p className="pixel-panel p-4">A loja está fechada no momento. Aguarde o professor abrir uma nova rotação.</p>

@@ -10,7 +10,7 @@ export default async function DevDuelPage({ searchParams }: { searchParams: Prom
   return (
     <main className="game-bg min-h-screen p-4">
       <div className="mx-auto max-w-xl">
-        <DuelExperience me={roster[0]} classmates={roster} autoStart={buscar !== undefined} backHref="/dev/duelo" />
+        <DuelExperience me={roster[0]} classmates={roster} autoStart={buscar !== undefined} backHref="/dev/duelo" mode="demo" />
       </div>
     </main>
   );

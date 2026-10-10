@@ -53,10 +53,12 @@ async function main() {
       console.log("Rode `npm run seed` antes do db:check.");
       process.exit(1);
     }
-    const rotation = await one<{ item_ids: string[] }>(
-      "select item_ids from shop_rotations where class_id = $1 order by starts_at desc limit 1",
+    // same rule as buy_item: the rotation open right now (an expired one is only renewed when someone opens the shop)
+    const rotation = (await one<{ item_ids: string[] } | undefined>(
+      "select item_ids from shop_rotations where class_id = $1 and starts_at <= now() and (ends_at is null or ends_at > now()) order by starts_at desc limit 1",
       [rich.class_id],
-    );
+    )) ?? { item_ids: [] as string[] };
+    if (rotation.item_ids.length === 0) console.log("• (a loja não tem rotação aberta agora: testes de compra pulados — abra a Loja uma vez para renovar)");
     const studentsInClass = Number((await one<{ n: string }>("select count(*) n from profiles where class_id = $1 and role = 'student'", [rich.class_id])).n);
 
     // ---------- anonymous visitor
@@ -81,7 +83,7 @@ async function main() {
       [rich.id],
       "permission denied",
     );
-    await expectError("aluno não compra fora da rotação", "select buy_item($1)", [
+    if (rotation.item_ids.length) await expectError("aluno não compra fora da rotação", "select buy_item($1)", [
       (await one<{ id: string }>("select id from items where not (id = any($1)) limit 1", [rotation.item_ids])).id,
     ], "item_not_in_shop");
 
@@ -142,6 +144,57 @@ async function main() {
       Number((await one<{ n: string }>("select count(*) n from wallets")).n) === studentsInClass,
     );
     await expectError("professor também não altera saldo pelo navegador", "update wallets set balance = 1", [], "permission denied");
+
+    // ---------- duels, XP and levels: students only read; the server writes through functions
+    await as("authenticated", rich.id);
+    await expectError("aluno não altera o próprio XP", "update pingo_progress set xp = 999999", [], "permission denied");
+    await expectError(
+      "aluno não insere duelo pelo navegador",
+      "insert into duels (class_id, challenger_id, defender_id, winner_id, seed, engine_version, balance, snapshots, events, counted) values ($1, $2, $3, $2, 1, 'x', '{}', '[]', '[]', true)",
+      [rich.class_id, rich.id, poor.id],
+      "permission denied",
+    );
+    await expectError(
+      "aluno não chama record_duel",
+      "select record_duel($1, $2, $1, 1, 'x', '{}', '[]', '[]', 9999, 9999, 99, 0, array[1])",
+      [rich.id, poor.id],
+      "permission denied",
+    );
+    await expectError("aluno não chama spend_stat_point", "select spend_stat_point($1, 'atk', 1, 99)", [rich.id], "permission denied");
+
+    await as("postgres");
+    const duel = (interval: number) =>
+      one<{ r: { xp_after: number; level_after: number; counted: boolean; xp_gained: number } }>(
+        "select record_duel($1, $2, $1, 1, 'test', '{}', '[]', '[]', 30, 20, 12, $3, array[65, 190]) as r",
+        [rich.id, poor.id, interval],
+      );
+    await client.query("delete from pingo_progress where owner_id = $1", [rich.id]);
+    await client.query("delete from duels where challenger_id = $1", [rich.id]);
+    const d1 = (await duel(0)).r;
+    check("duelo vencido dá 30 XP", d1.xp_gained === 30 && d1.counted && d1.level_after === 1, JSON.stringify(d1));
+    await duel(0);
+    const d3 = (await duel(0)).r;
+    check("sobe de nível ao passar do limite de XP", d3.xp_after === 90 && d3.level_after === 2, JSON.stringify(d3));
+    await expectError("anti-spam: duelos em sequência rápida são bloqueados", "select record_duel($1, $2, $1, 1, 't', '{}', '[]', '[]', 30, 20, 12, 3600, array[65])", [rich.id, poor.id], "too_fast");
+    await client.query("select spend_stat_point($1, 'hp', 1, 1)", [rich.id]);
+    await expectError("não gasta mais pontos do que tem", "select spend_stat_point($1, 'hp', 1, 1)", [rich.id], "no_points");
+    const limited = await one<{ r: { counted: boolean; xp_gained: number } }>(
+      "select record_duel($1, $2, $1, 1, 'test', '{}', '[]', '[]', 30, 20, 3, 0, array[65]) as r",
+      [rich.id, poor.id],
+    );
+    check("depois do limite diário o duelo é amistoso (0 XP)", !limited.r.counted && limited.r.xp_gained === 0, JSON.stringify(limited.r));
+
+    const outsider = await one<{ id: string } | undefined>(
+      "select id from profiles where class_id = $1 and role = 'student' and id not in ($2, $3) limit 1",
+      [rich.class_id, rich.id, poor.id],
+    );
+    if (outsider) {
+      await as("authenticated", outsider.id);
+      check("colega não vê duelos dos outros", Number((await one<{ n: string }>("select count(*) n from duels")).n) === 0);
+      check("colega vê o nível da turma", Number((await one<{ n: string }>("select count(*) n from pingo_progress")).n) >= 1);
+    }
+    await as("authenticated", rich.id);
+    check("aluno vê os próprios duelos", Number((await one<{ n: string }>("select count(*) n from duels")).n) >= 4);
 
     // ---------- self sign-up: pending students see nothing of the class
     await as("authenticated", rich.id);

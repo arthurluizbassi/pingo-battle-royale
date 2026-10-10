@@ -3,14 +3,16 @@ import { EmptySlotIcon, ItemIcon } from "@/components/pingo/ItemIcon";
 import { StatTable } from "@/components/pingo/StatTable";
 import { Coins } from "@/components/ui/Coins";
 import { Countdown } from "@/components/ui/Countdown";
-import { buildFromItems, CATEGORY_LABEL, getItem, loadoutItems, type ItemCategory } from "@/content/items";
+import { CATEGORY_LABEL, getItem, loadoutItems, type ItemCategory } from "@/content/items";
 import { formatDateTime } from "@/lib/format";
 import { lookFromPingo } from "@/lib/snapshot";
 import { createClient } from "@/lib/supabase/server";
 import type { TrophyRow } from "@/lib/db-types";
 import { requireStudent } from "@/server/auth";
 import { getActiveSeason, getNextBattle, getSeasonRanking, getStudentState } from "@/server/queries";
+import { statsWithLevel } from "@/lib/levels";
 import { DashboardPingo } from "./DashboardPingo";
+import { LevelCard } from "./LevelCard";
 
 const SLOTS: ItemCategory[] = ["weapon", "helmet", "outfit"];
 
@@ -22,6 +24,7 @@ export default async function MyPingoPage() {
     getNextBattle(classId),
     getActiveSeason(classId),
   ]);
+  const progress = state.progress;
   const ranking = season ? await getSeasonRanking(season.id) : [];
   const myRank = ranking.findIndex((r) => r.profileId === session.userId);
   const supabase = await createClient();
@@ -45,7 +48,8 @@ export default async function MyPingoPage() {
   }
 
   const equippedItems = loadoutItems(state.loadout);
-  const { stats } = buildFromItems(equippedItems);
+  // items + the points earned in duels
+  const stats = statsWithLevel(equippedItems.map((i) => i.statModifiers), progress.statPoints);
   const look = lookFromPingo(state.pingo);
 
   return (
@@ -93,6 +97,7 @@ export default async function MyPingoPage() {
         <Link href="/arena/duelo?buscar" className="pixel-btn btn-pink text-2xl py-4">
           ⚔️ Encontrar Batalha
         </Link>
+        <LevelCard progress={progress} stats={stats} />
         <section className="pixel-panel p-4">
           <h2 className="font-pixel text-lg mb-2">⚔️ Próximo Battle Royale</h2>
           {nextBattle ? (

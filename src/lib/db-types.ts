@@ -1,6 +1,6 @@
 /** Row shapes of the tables we read. Kept by hand: small schema, easy to follow. */
 import type { ItemCategory } from "@/content/items";
-import type { Stats, SpecialEffect } from "@/engine";
+import type { BattleEvent, Stats, SpecialEffect } from "@/engine";
 import type { PingoLook } from "@/sprites/compose";
 
 export type Role = "student" | "teacher";
@@ -116,6 +116,9 @@ export interface ParticipantSnapshot {
   stats: Stats;
   effects: SpecialEffect[];
   powerScore: number;
+  /** level and stat points at the moment of the snapshot (absent in snapshots made before levels existed) */
+  level?: number;
+  statPoints?: Partial<Record<keyof Stats, number>>;
 }
 
 export interface ParticipantRow {
@@ -159,5 +162,29 @@ export interface TrophyRow {
   season_id: string | null;
   kind: "champion" | "runner_up" | "third" | "top_eliminator" | "season_champion";
   label: string;
+  created_at: string;
+}
+
+export interface ProgressRow {
+  owner_id: string;
+  xp: number;
+  level: number;
+  stat_points: Record<string, number>;
+  points_spent: number;
+  updated_at: string;
+}
+
+export interface DuelRow {
+  id: string;
+  class_id: string;
+  challenger_id: string;
+  defender_id: string;
+  winner_id: string;
+  seed: number;
+  engine_version: string;
+  snapshots: [ParticipantSnapshot, ParticipantSnapshot];
+  events: BattleEvent[];
+  xp_gained: number;
+  counted: boolean;
   created_at: string;
 }

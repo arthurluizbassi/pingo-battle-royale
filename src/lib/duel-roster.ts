@@ -5,6 +5,7 @@ import type { PingoLook } from "@/sprites/compose";
 import { DETAIL_STYLES, EYE_STYLES, MOUTH_STYLES } from "@/sprites/data/face";
 import { BODY_COLORS } from "@/sprites/palette";
 import type { PingoRow, ProfileRow } from "./db-types";
+import { NEW_PROGRESS, statsWithLevel, type Progress } from "./levels";
 import { lookFromPingo } from "./snapshot";
 
 /** Everything a duel needs about one Pingo: how it looks and how it fights. */
@@ -14,9 +15,15 @@ export interface DuelEntrant {
   effects: SpecialEffect[];
 }
 
-export function entrantFrom(profile: Pick<ProfileRow, "id" | "display_name">, pingo: PingoRow | null, loadout: Loadout): DuelEntrant {
+export function entrantFrom(
+  profile: Pick<ProfileRow, "id" | "display_name">,
+  pingo: PingoRow | null,
+  loadout: Loadout,
+  progress: Progress = NEW_PROGRESS,
+): DuelEntrant {
   const items = loadoutItems(loadout);
-  const { stats, effects } = buildFromItems(items);
+  const { effects } = buildFromItems(items);
+  const stats = statsWithLevel(items.map((i) => i.statModifiers), progress.statPoints);
   const sprite = (cat: ItemCategory) => getItem(loadout[cat])?.sprite ?? null;
   return {
     fighter: {
@@ -25,7 +32,7 @@ export function entrantFrom(profile: Pick<ProfileRow, "id" | "display_name">, pi
       displayName: profile.display_name,
       look: lookFromPingo(pingo),
       gear: { weapon: sprite("weapon"), helmet: sprite("helmet"), outfit: sprite("outfit") },
-      level: 1,
+      level: progress.level,
     },
     stats,
     effects,

@@ -8,7 +8,6 @@ import { ItemDetails } from "@/components/pingo/ItemDetails";
 import { PingoAvatar } from "@/components/pingo/PingoAvatar";
 import { StatTable } from "@/components/pingo/StatTable";
 import {
-  buildFromItems,
   CATEGORY_LABEL,
   getItem,
   loadoutItems,
@@ -18,19 +17,30 @@ import {
 } from "@/content/items";
 import { useScrollIntoViewOnMobile } from "@/components/ui/useScrollIntoViewOnMobile";
 import { equipItem } from "@/server/actions/student";
+import { statsWithLevel, type StatPoints } from "@/lib/levels";
 import type { PingoLook } from "@/sprites/compose";
 
 const SLOTS: ItemCategory[] = ["weapon", "helmet", "outfit"];
 const PLURAL: Record<ItemCategory, string> = { weapon: "Armas", helmet: "Capacetes", outfit: "Roupas" };
 
-export function InventoryView({ owned, loadout, look }: { owned: string[]; loadout: Loadout; look: PingoLook }) {
+export function InventoryView({
+  owned,
+  loadout,
+  look,
+  statPoints = {},
+}: {
+  owned: string[];
+  loadout: Loadout;
+  look: PingoLook;
+  statPoints?: StatPoints;
+}) {
   const items = owned.map((id) => getItem(id)).filter((i): i is ItemDefinition => i !== null);
   const [selected, setSelected] = useState<ItemDefinition | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
   const detailsRef = useScrollIntoViewOnMobile<HTMLElement>(selected?.id);
-  const stats = buildFromItems(loadoutItems(loadout)).stats;
+  const stats = statsWithLevel(loadoutItems(loadout).map((i) => i.statModifiers), statPoints);
 
   const setSlot = (slot: ItemCategory, itemId: string | null) =>
     startTransition(async () => {
@@ -122,7 +132,7 @@ export function InventoryView({ owned, loadout, look }: { owned: string[]; loado
 
       <aside ref={detailsRef} className="pixel-panel p-4 self-start lg:sticky lg:top-20 scroll-mt-16">
         {selected ? (
-          <ItemDetails item={selected} look={look} loadout={loadout}>
+          <ItemDetails item={selected} look={look} loadout={loadout} statPoints={statPoints}>
             <div className="flex justify-end gap-2">
               {loadout[selected.category] === selected.id ? (
                 <button className="pixel-btn btn-white" disabled={pending} onClick={() => setSlot(selected.category, null)}>

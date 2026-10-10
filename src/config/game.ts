@@ -37,6 +37,40 @@ export const GAME = {
     pointsPerKill: 1,
   },
 
+  /**
+   * Duels and levels. Numbers chosen with `npx tsx scripts/simulate-levels.ts` (see GAME_BALANCE.md):
+   * an active student reaches the max level in ~6 weeks; a max-level, well-equipped Pingo beats
+   * a naked level-1 one ~92% of the time; any single stat is as good as a mixed build.
+   */
+  duels: {
+    xpWin: 30,
+    xpLoss: 20,
+    /** duels per day that give XP (after that: friendly duels, no XP) */
+    dailyXpDuels: 12,
+    /** anti-spam: a duel takes ~25 s to watch anyway */
+    minSecondsBetween: 8,
+    /** matchmaking ("meio" rule): weight = exp(-|Δlevel| / levelWidth) */
+    levelWidth: 5,
+    maxPerOpponentPerDay: 2,
+    avoidLastOpponents: 5,
+  },
+
+  levels: {
+    max: 20,
+    pointsPerLevel: 1,
+    /** total XP to reach the max level; each level costs a bit more than the previous one */
+    totalXp: 12_000,
+    /** what ONE upgrade gives (crit/dodge as fractions) and how many points it costs */
+    upgrades: {
+      hp: { value: 2, cost: 1 },
+      atk: { value: 1, cost: 1 },
+      def: { value: 1, cost: 1 },
+      spd: { value: 1, cost: 3 },
+      crit: { value: 0.015, cost: 1 },
+      dodge: { value: 0.015, cost: 1 },
+    },
+  },
+
   /** Students log in with a username; Supabase Auth needs an e-mail, so we derive one. */
   auth: {
     usernameEmailDomain: "alunos.pingo.local",

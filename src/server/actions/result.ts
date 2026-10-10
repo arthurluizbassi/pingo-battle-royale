@@ -12,6 +12,10 @@ const DB_ERRORS: Record<string, string> = {
   battle_not_scheduled: "Os loadouts já foram travados.",
   battle_not_locked: "Trave os loadouts antes de iniciar.",
   zero_amount: "A quantidade não pode ser zero.",
+  too_fast: "Calma! Espere alguns segundos entre um duelo e outro.",
+  no_opponent: "Ainda não há colegas na turma para duelar.",
+  no_points: "Você não tem pontos para distribuir.",
+  stat_capped: "Esse atributo já está no máximo.",
 };
 
 export function friendlyError(error: unknown): string {

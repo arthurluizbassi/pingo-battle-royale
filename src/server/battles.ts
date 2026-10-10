@@ -9,7 +9,8 @@ import {
   type BattleResult,
 } from "@/engine";
 import { summarizeBattle, trophiesFor } from "@/lib/battle-summary";
-import type { BattleRow, EquippedRow, ParticipantRow, ParticipantSnapshot, PingoRow, ProfileRow } from "@/lib/db-types";
+import type { BattleRow, EquippedRow, ParticipantRow, ParticipantSnapshot, PingoRow, ProfileRow, ProgressRow } from "@/lib/db-types";
+import { progressFromRow } from "@/lib/levels";
 import { buildSnapshot, combatantFromSnapshot } from "@/lib/snapshot";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -38,16 +39,18 @@ export async function lockBattle(battleId: string, classId: string): Promise<voi
   const ids = (participants ?? []).map((p) => p.profile_id as string);
   if (ids.length < 2) throw new Error("São necessários pelo menos 2 participantes.");
 
-  const [{ data: profiles }, { data: pingos }, { data: equipped }] = await Promise.all([
+  const [{ data: profiles }, { data: pingos }, { data: equipped }, { data: progress }] = await Promise.all([
     admin.from("profiles").select("*").in("id", ids).returns<ProfileRow[]>(),
     admin.from("pingos").select("*").in("owner_id", ids).returns<PingoRow[]>(),
     admin.from("equipped_items").select("*").in("owner_id", ids).returns<EquippedRow[]>(),
+    admin.from("pingo_progress").select("*").in("owner_id", ids).returns<ProgressRow[]>(),
   ]);
 
   const snapshots = (profiles ?? []).map((profile) => {
     const pingo = (pingos ?? []).find((p) => p.owner_id === profile.id) ?? null;
     const items = (equipped ?? []).filter((e) => e.owner_id === profile.id).map((e) => e.item_id);
-    const snapshot = buildSnapshot(profile, pingo, items);
+    // level points earned in duels count in the Battle Royale too
+    const snapshot = buildSnapshot(profile, pingo, items, progressFromRow((progress ?? []).find((p) => p.owner_id === profile.id)));
     return { profile_id: profile.id, power_score: snapshot.powerScore, snapshot };
   });
 

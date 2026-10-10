@@ -121,3 +121,34 @@ Resultados de `npm run simulate` (10 000 duelos por cenário):
 ## 11. Reprodutibilidade
 
 Toda aleatoriedade vem de um único PRNG com seed (`mulberry32`, `src/engine/rng.ts`). Uma batalha guarda: seed, versão do motor, **cópia completa da config de balanceamento**, e snapshot dos participantes (itens copiados, stats e efeitos). O botão "Verificar reprodutibilidade" do professor re-simula e compara com o log salvo. Mudar o `balance.ts` depois **não altera** batalhas antigas.
+
+## 12. Duelos, XP e níveis
+
+Duelo = 1 contra 1 contra o Pingo (offline) de um colega, disparado por "Encontrar Batalha".
+O servidor sorteia o adversário, congela os dois Pingos, roda o motor e grava tudo
+(`record_duel`, uma transação). Números em `GAME.duels` e `GAME.levels`; simulações em
+`npx tsx scripts/simulate-levels.ts calib|edge|strength|season`.
+
+| Regra | Valor | Por quê |
+|---|---|---|
+| Vida nos duelos (`DUEL_BALANCE.hpMultiplier`) | ×1,7 | ~7 golpes por duelo (20–30 s de show) sem mudar as chances (forte×pelado 81% → 83%) |
+| XP vitória / derrota | 30 / 20 | perder também progride: o nível mede dedicação, não talento |
+| Duelos com XP por dia | 12 | depois disso, amistoso (0 XP); intervalo mínimo de 8 s |
+| Níveis | 1 → 20, 1 ponto por nível | o ativo chega ao 20 em ~6 semanas; casual fica ~3–4 em 8 semanas |
+| Curva | nível L→L+1 custa ≈ 63·L XP (65 para o nível 2) | primeiro nível no primeiro dia; total 12 000 XP |
+| Ponto em HP / ATK / DEF | +2 / +1 / +1 | calibrados para valer o mesmo |
+| Ponto em CRIT / ESQ | +1,5% / +1,5% | idem |
+| VEL | +1 por 3 pontos | velocidade é o atributo mais forte |
+| Matchmaking ("meio") | peso exp(−\|Δnível\|/5), máx 2×/dia contra o mesmo, evita os últimos 5 | viciado vence ~60%, casual ~40%, quase sem repetição numa turma de 35 |
+
+Resultados da simulação (turma virtual de 20–35 alunos, 8 semanas):
+
+- Bem equipado + nível 20 vence pelado nível 1 em ~92% (82% sem níveis).
+- Pelado nível 20 vence bem equipado nível 1 em ~42%: quem joga muito compete mesmo sem moedas.
+- Colocar os 19 pontos num atributo só nunca passa de ~55% contra uma build mista: nenhum atributo é "o óbvio".
+- Battle Royale de 20: o aluno parado cai de 2,3% para ~1,4% de vitória; o mais forte fica em ~7%.
+  O royale é caótico por natureza; é nos duelos que a força aparece.
+
+Os pontos de nível também valem no Battle Royale (entram no snapshot no LOCK) e respeitam os
+mesmos limites de atributo. Redistribuir os pontos é grátis. O professor pode zerar os níveis da
+turma em Temporadas (o histórico de duelos fica).

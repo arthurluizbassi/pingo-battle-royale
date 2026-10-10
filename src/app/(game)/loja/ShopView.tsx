@@ -8,6 +8,7 @@ import { Coins } from "@/components/ui/Coins";
 import { CATEGORY_LABEL, getItem, type ItemCategory, type ItemDefinition, type Loadout } from "@/content/items";
 import { useScrollIntoViewOnMobile } from "@/components/ui/useScrollIntoViewOnMobile";
 import { buyItem, equipItem } from "@/server/actions/student";
+import type { StatPoints } from "@/lib/levels";
 import type { PingoLook } from "@/sprites/compose";
 
 const TABS: Array<{ id: ItemCategory | "all"; label: string }> = [
@@ -23,12 +24,14 @@ export function ShopView({
   owned,
   loadout,
   look,
+  statPoints = {},
 }: {
   itemIds: string[];
   balance: number;
   owned: string[];
   loadout: Loadout;
   look: PingoLook;
+  statPoints?: StatPoints;
 }) {
   const items = itemIds.map((id) => getItem(id)).filter((i): i is ItemDefinition => i !== null);
   const [tab, setTab] = useState<ItemCategory | "all">("all");
@@ -137,7 +140,7 @@ export function ShopView({
 
       <aside ref={detailsRef} className="pixel-panel p-4 self-start lg:sticky lg:top-20 scroll-mt-16">
         {selected ? (
-          <ItemDetails item={selected} look={look} loadout={loadout}>
+          <ItemDetails item={selected} look={look} loadout={loadout} statPoints={statPoints}>
             <div className="flex justify-end">{actionFor(selected)}</div>
           </ItemDetails>
         ) : (

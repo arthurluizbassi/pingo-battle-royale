@@ -4,7 +4,6 @@ import { PingoAvatar } from "@/components/pingo/PingoAvatar";
 import { StatTable } from "@/components/pingo/StatTable";
 import { Coins } from "@/components/ui/Coins";
 import {
-  buildFromItems,
   CATEGORY_LABEL,
   loadoutItems,
   TAG_LABEL,
@@ -13,6 +12,7 @@ import {
 } from "@/content/items";
 import { STAT_KEYS } from "@/engine";
 import { EFFECT_NAME, effectDescription, formatModifier } from "@/lib/format";
+import { statsWithLevel, type StatPoints } from "@/lib/levels";
 import type { PingoLook } from "@/sprites/compose";
 
 export function ModifierList({ item }: { item: ItemDefinition }) {
@@ -37,16 +37,20 @@ export function ItemDetails({
   item,
   look,
   loadout,
+  statPoints = {},
   children,
 }: {
   item: ItemDefinition;
   look: PingoLook;
   loadout: Loadout;
+  /** level points from duels (they count in every comparison) */
+  statPoints?: StatPoints;
   children?: React.ReactNode;
 }) {
   const tried: Loadout = { ...loadout, [item.category]: item.id };
-  const current = buildFromItems(loadoutItems(loadout)).stats;
-  const next = buildFromItems(loadoutItems(tried)).stats;
+  const statsOf = (l: Loadout) => statsWithLevel(loadoutItems(l).map((i) => i.statModifiers), statPoints);
+  const current = statsOf(loadout);
+  const next = statsOf(tried);
   const replacing = loadout[item.category] && loadout[item.category] !== item.id;
 
   return (

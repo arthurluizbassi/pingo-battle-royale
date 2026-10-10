@@ -305,6 +305,17 @@ export async function rejectStudent(profileId: string): Promise<ActionResult> {
 }
 
 // ------------------------------------------------------------------ seasons
+/** Everyone back to level 1 with 0 XP and no points (the duel history is kept). */
+export async function resetClassProgress(): Promise<ActionResult> {
+  return runAction(async () => {
+    const session = await assertTeacher();
+    const { error } = await createAdminClient().rpc("reset_class_progress", { p_class: session.profile.class_id });
+    if (error) throw new Error(error.message);
+    revalidatePath("/", "layout");
+    return "Níveis zerados: todos recomeçam do nível 1.";
+  });
+}
+
 export async function createSeason(name: string): Promise<ActionResult> {
   return runAction(async () => {
     const session = await assertTeacher();

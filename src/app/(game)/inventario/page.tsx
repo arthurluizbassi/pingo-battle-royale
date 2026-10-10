@@ -14,7 +14,12 @@ export default async function InventoryPage() {
           Você pode ter quantos itens quiser, mas só entra na arena com 1 arma, 1 capacete e 1 roupa.
         </p>
       </div>
-      <InventoryView owned={state.inventory} loadout={state.loadout} look={lookFromPingo(state.pingo)} />
+      <InventoryView
+        owned={state.inventory}
+        loadout={state.loadout}
+        look={lookFromPingo(state.pingo)}
+        statPoints={state.progress.statPoints}
+      />
     </div>
   );
 }

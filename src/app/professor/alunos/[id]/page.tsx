@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { Coins } from "@/components/ui/Coins";
 import { Ledger } from "@/components/ui/Ledger";
 import { buildFromItems, CATEGORY_LABEL, getItem, loadoutItems } from "@/content/items";
+import { statsWithLevel } from "@/lib/levels";
 import { powerScore } from "@/engine";
 import type { ProfileRow, TransactionRow } from "@/lib/db-types";
 import { lookFromPingo } from "@/lib/snapshot";
@@ -35,7 +36,8 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
     .order("created_at", { ascending: false })
     .limit(100)
     .returns<TransactionRow[]>();
-  const build = buildFromItems(loadoutItems(state.loadout));
+  const items = loadoutItems(state.loadout);
+  const build = { stats: statsWithLevel(items.map((i) => i.statModifiers), state.progress.statPoints), effects: buildFromItems(items).effects };
 
   return (
     <div className="grid gap-4">
@@ -68,6 +70,9 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
               );
             })}
           </div>
+          <p className="text-sm mb-2">
+            ⭐ <b>Nível {state.progress.level}</b> · {state.progress.xp} XP · pontos usados: {state.progress.pointsSpent}
+          </p>
           <StatTable stats={build.stats} compact />
           <p className="text-xs text-muted mt-2">Power score estimado: {powerScore(build.stats, build.effects)} (Pingo pelado = 100)</p>
         </Card>
