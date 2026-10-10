@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/professor/moedas", label: "Moedas", icon: "💰" },
   { href: "/professor/loja", label: "Loja e catálogo", icon: "🛒" },
   { href: "/professor/batalhas", label: "Battle Royales", icon: "⚔️" },
+  { href: "/professor/duelos", label: "Duelos", icon: "🥊" },
   { href: "/professor/temporadas", label: "Temporadas", icon: "🏆" },
 ];
 

@@ -195,6 +195,12 @@ async function main() {
     }
     await as("authenticated", rich.id);
     check("aluno vê os próprios duelos", Number((await one<{ n: string }>("select count(*) n from duels")).n) >= 4);
+    await as("authenticated", teacher.id);
+    check(
+      "professor vê os duelos e níveis da turma",
+      Number((await one<{ n: string }>("select count(*) n from duels where class_id = $1", [rich.class_id])).n) >= 4 &&
+        Number((await one<{ n: string }>("select count(*) n from pingo_progress where owner_id = $1", [rich.id])).n) === 1,
+    );
 
     // ---------- self sign-up: pending students see nothing of the class
     await as("authenticated", rich.id);
