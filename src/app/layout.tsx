@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Nunito, Pixelify_Sans } from "next/font/google";
+import { Jersey_10, Nunito } from "next/font/google";
 import "./globals.css";
 
-const pixelify = Pixelify_Sans({ variable: "--font-pixelify", subsets: ["latin"] });
+// chunky pixel face (Forager-like) for titles, buttons and numbers; Nunito keeps body text easy to read
+const gameFont = Jersey_10({ weight: "400", variable: "--font-game", subsets: ["latin", "latin-ext"] });
 const nunito = Nunito({ variable: "--font-nunito", subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,7 +20,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${pixelify.variable} ${nunito.variable} antialiased`}>{children}</body>
+      <body className={`${gameFont.variable} ${nunito.variable} antialiased`}>{children}</body>
     </html>
   );
 }

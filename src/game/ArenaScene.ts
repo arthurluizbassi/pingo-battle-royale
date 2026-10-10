@@ -85,6 +85,8 @@ export function mountArena(
   const n = data.participants.length;
   const pingoScale = n <= 6 ? 2.2 : n <= 12 ? 1.8 : n <= 20 ? 1.5 : 1.25;
   const font = data.fontFamily || "monospace";
+  // the game font (Jersey 10) is drawn small for its size; scale every label so it reads like the UI
+  const px = (size: number) => `${Math.round(size * 1.25)}px`;
 
   const state = { playing: true, speed: 1, elapsed: 0, stepIndex: 0, feedIndex: 0, finished: false };
 
@@ -121,7 +123,7 @@ export function mountArena(
 
       // title
       this.add
-        .text(W / 2, 22, "PINGO BATTLE ROYALE", { fontFamily: font, fontSize: "26px", color: "#ffd23f", stroke: "#231a2e", strokeThickness: 6 })
+        .text(W / 2, 22, "PINGO BATTLE ROYALE", { fontFamily: font, fontSize: px(26), color: "#ffd23f", stroke: "#231a2e", strokeThickness: 6 })
         .setOrigin(0.5)
         .setResolution(2);
     }
@@ -191,7 +193,7 @@ export function mountArena(
       const label = this.add
         .text(0, -36 * pingoScale, p.pingoName, {
           fontFamily: font,
-          fontSize: `${Math.round(9 + pingoScale * 2)}px`,
+          fontSize: px(9 + pingoScale * 2),
           color: "#ffffff",
           stroke: "#231a2e",
           strokeThickness: 4,
@@ -257,7 +259,7 @@ export function mountArena(
 
     floatText(x: number, y: number, text: string, color: string, size = 16, rise = 36) {
       const t = this.add
-        .text(x, y, text, { fontFamily: font, fontSize: `${size}px`, color, stroke: "#231a2e", strokeThickness: 5 })
+        .text(x, y, text, { fontFamily: font, fontSize: px(size), color, stroke: "#231a2e", strokeThickness: 5 })
         .setOrigin(0.5)
         .setDepth(2000)
         .setResolution(2);
@@ -400,7 +402,7 @@ export function mountArena(
       const label = this.add
         .text(W / 2, H / 2, text, {
           fontFamily: font,
-          fontSize: tone === "final" ? "40px" : "34px",
+          fontSize: px(tone === "final" ? 40 : 34),
           color: `#${color.toString(16).padStart(6, "0")}`,
           stroke: "#231a2e",
           strokeThickness: 8,

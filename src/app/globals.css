@@ -16,9 +16,9 @@
   --color-muted: #6f6680;
 }
 
-/* inline: next/font defines --font-pixelify/--font-nunito on <body>, so resolve at use site */
+/* inline: next/font defines --font-game/--font-nunito on <body>, so resolve at use site */
 @theme inline {
-  --font-pixel: var(--font-pixelify), "Courier New", monospace;
+  --font-pixel: var(--font-game), "Courier New", monospace;
   --font-body: var(--font-nunito), system-ui, sans-serif;
 }
 
@@ -44,9 +44,28 @@ body {
   background-position: 0 0, 16px 16px;
 }
 
+/* Jersey 10 is drawn small for its em box: font-size-adjust scales it so the existing
+   text-* sizes keep roughly the old visual size without touching every component. */
+.font-pixel,
+.pixel-btn,
+.pixel-chip {
+  font-size-adjust: cap-height 0.7;
+}
+
 .font-pixel {
-  font-family: var(--font-pixelify), "Courier New", monospace;
-  letter-spacing: 0.02em;
+  font-family: var(--font-game), "Courier New", monospace;
+  letter-spacing: 0.03em;
+}
+
+/* page titles: white letters with a chunky ink outline (Forager-style) */
+h1.font-pixel {
+  font-size-adjust: cap-height 0.8;
+  color: white;
+  letter-spacing: 0.04em;
+  text-shadow:
+    -2px 0 var(--color-ink), 2px 0 var(--color-ink), 0 -2px var(--color-ink), 0 2px var(--color-ink),
+    -2px -2px var(--color-ink), 2px -2px var(--color-ink), -2px 2px var(--color-ink), 2px 2px var(--color-ink),
+    0 4px var(--color-ink);
 }
 
 .pixel-panel {
@@ -64,7 +83,7 @@ body {
 }
 
 .pixel-btn {
-  font-family: var(--font-pixelify), "Courier New", monospace;
+  font-family: var(--font-game), "Courier New", monospace;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -99,7 +118,7 @@ body {
 .pixel-btn.btn-small { padding: 0.3rem 0.6rem; font-size: 0.85rem; border-width: 2px; box-shadow: 0 3px 0 var(--color-ink); }
 
 .pixel-chip {
-  font-family: var(--font-pixelify), "Courier New", monospace;
+  font-family: var(--font-game), "Courier New", monospace;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;

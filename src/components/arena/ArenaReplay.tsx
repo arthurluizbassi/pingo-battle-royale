@@ -53,7 +53,7 @@ export function ArenaReplay({
       const [{ default: Phaser }, { mountArena }] = await Promise.all([import("phaser"), import("@/game/ArenaScene")]);
       if (cancelled || !hostRef.current) return;
       await document.fonts?.ready;
-      const fontFamily = getComputedStyle(document.body).getPropertyValue("--font-pixelify").trim();
+      const fontFamily = getComputedStyle(document.body).getPropertyValue("--font-game").trim();
       const forceTimeout = new URLSearchParams(window.location.search).has("forceTimeout");
       ctrl = mountArena(
         Phaser,
