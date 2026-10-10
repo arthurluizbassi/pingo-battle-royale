@@ -161,7 +161,7 @@ export function simulateBattle(
 
 function createFighter(p: CombatantInput, config: BalanceConfig, rng: Rng): Fighter {
   const stats = clampStats(p.stats, config);
-  const maxHp = Math.round(stats.hp);
+  const maxHp = Math.round(stats.hp * config.hpMultiplier);
   return {
     id: p.id,
     stats,

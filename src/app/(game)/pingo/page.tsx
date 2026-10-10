@@ -90,6 +90,9 @@ export default async function MyPingoPage() {
 
       {/* ---- side column ---- */}
       <div className="grid gap-5 content-start">
+        <Link href="/arena/duelo?buscar" className="pixel-btn btn-pink text-2xl py-4">
+          ⚔️ Encontrar Batalha
+        </Link>
         <section className="pixel-panel p-4">
           <h2 className="font-pixel text-lg mb-2">⚔️ Próximo Battle Royale</h2>
           {nextBattle ? (

@@ -15,6 +15,12 @@ export const BALANCE = {
     dodge: 0.12,
   } satisfies Stats,
 
+  /**
+   * Multiplies max HP after the caps. 1 in the Battle Royale; duels use DUEL_BALANCE
+   * (more HP = more hits = a longer, more fun show, with almost the same win rates).
+   */
+  hpMultiplier: 1,
+
   /** Hard limits applied after summing equipment. [min, max] */
   caps: {
     hp: [50, 200],
@@ -94,6 +100,9 @@ export const BALANCE = {
 };
 
 export type BalanceConfig = typeof BALANCE;
+
+/** 1v1 duels: same rules, more HP so each duel lasts ~7-8 hits instead of ~4. */
+export const DUEL_BALANCE: BalanceConfig = { ...BALANCE, hpMultiplier: 1.7 };
 
 /** Bump when combat rules change. Stored with each battle for traceability. */
 export const ENGINE_VERSION = "pingo-engine-1";

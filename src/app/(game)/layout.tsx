@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { GameNav } from "@/components/ui/GameNav";
 import { Coins } from "@/components/ui/Coins";
 import { requireUser } from "@/server/auth";
@@ -24,6 +25,13 @@ export default async function GameLayout({ children }: { children: React.ReactNo
           </a>
           <GameNav role={session.profile.role} />
           <div className="ml-auto flex items-center gap-2">
+            {!isTeacher && (
+              // client-side navigation keeps the click's "user gesture", so the duel can play sound
+              <Link href="/arena/duelo?buscar" className="pixel-btn btn-small btn-pink whitespace-nowrap">
+                ⚔️ <span className="hidden sm:inline">Encontrar Batalha</span>
+                <span className="sm:hidden">Batalhar</span>
+              </Link>
+            )}
             {!isTeacher && (
               <span className="pixel-chip bg-white">
                 <Coins amount={balance} size="sm" />
