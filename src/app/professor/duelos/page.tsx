@@ -11,30 +11,42 @@ import { requireTeacher } from "@/server/auth";
 import { schoolDay } from "@/server/duels";
 import { getClassProgress, getClassmates } from "@/server/queries";
 
-const MAX_ROWS = 1000;
+/** Supabase returns at most 1000 rows per request, so the week is read page by page. */
+const PAGE = 1000;
+const MAX_PAGES = 30;
 const WEEKDAY = new Intl.DateTimeFormat("pt-BR", { weekday: "short", timeZone: "America/Sao_Paulo" });
 
 type Row = Pick<DuelRow, "id" | "challenger_id" | "defender_id" | "winner_id" | "xp_gained" | "counted" | "created_at">;
+
+async function duelsSince(classId: string, since: Date): Promise<Row[]> {
+  const supabase = await createClient();
+  const rows: Row[] = [];
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const { data } = await supabase
+      .from("duels")
+      .select("id, challenger_id, defender_id, winner_id, xp_gained, counted, created_at")
+      .eq("class_id", classId)
+      .gte("created_at", since.toISOString())
+      .order("created_at", { ascending: false })
+      .order("id")
+      .range(page * PAGE, page * PAGE + PAGE - 1)
+      .returns<Row[]>();
+    rows.push(...(data ?? []));
+    if (!data || data.length < PAGE) break;
+  }
+  return rows;
+}
 
 /** Teacher view of the 1v1 duels: is the class playing? who levels up? watch any duel. */
 export default async function TeacherDuelsPage() {
   const session = await requireTeacher();
   const classId = session.profile.class_id;
   const since = new Date(Date.now() - 7 * 24 * 3600 * 1000);
-  const supabase = await createClient();
-  const [everyone, progress, { data }] = await Promise.all([
+  const [everyone, progress, duels] = await Promise.all([
     getClassmates(classId),
     getClassProgress(),
-    supabase
-      .from("duels")
-      .select("id, challenger_id, defender_id, winner_id, xp_gained, counted, created_at")
-      .eq("class_id", classId)
-      .gte("created_at", since.toISOString())
-      .order("created_at", { ascending: false })
-      .limit(MAX_ROWS)
-      .returns<Row[]>(),
+    duelsSince(classId, since),
   ]);
-  const duels = data ?? [];
   const students = everyone.filter((s) => s.profile.active && !s.profile.pending);
   const nameOf = new Map(everyone.map((s) => [s.profile.id, s.profile.display_name]));
   const today = schoolDay(new Date());
@@ -82,7 +94,7 @@ export default async function TeacherDuelsPage() {
           <p className="font-pixel text-4xl">{duelsToday}</p>
         </Card>
         <Card title="Últimos 7 dias">
-          <p className="font-pixel text-4xl">{duels.length >= MAX_ROWS ? `${MAX_ROWS}+` : duels.length}</p>
+          <p className="font-pixel text-4xl">{duels.length}</p>
         </Card>
         <Card title="Alunos que jogaram na semana">
           <p className="font-pixel text-4xl">
