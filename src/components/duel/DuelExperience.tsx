@@ -348,10 +348,45 @@ export function DuelStage({
   onFinished: (winnerId: string) => void;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const ctrl = useRef<DuelController | null>(null);
   const [speed, setSpeed] = useState(1);
+  /** native fullscreen (Android, desktop) or a CSS stand-in where the browser has none (iPhone) */
+  const [nativeFull, setNativeFull] = useState(false);
+  const [cssFull, setCssFull] = useState(false);
+  const expanded = nativeFull || cssFull;
   const finished = useRef(onFinished);
   finished.current = onFinished;
+
+  useEffect(() => {
+    const sync = () => setNativeFull(document.fullscreenElement === stageRef.current);
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
+  }, []);
+
+  const toggleFull = async () => {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen().catch(() => {});
+      return;
+    }
+    if (cssFull) {
+      setCssFull(false);
+      return;
+    }
+    const el = stageRef.current;
+    if (el?.requestFullscreen) {
+      try {
+        await el.requestFullscreen();
+        // phones: turn the screen sideways when the browser allows it (Android Chrome)
+        const orientation = screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> };
+        await orientation.lock?.("landscape").catch(() => {});
+        return;
+      } catch {
+        // fall through to the CSS version
+      }
+    }
+    setCssFull(true);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -382,8 +417,21 @@ export function DuelStage({
   const winnerId = useMemo(() => events.find((e) => e.type === "victory")?.id ?? foe.id, [events, foe]);
 
   return (
-    <div className="w-full max-w-6xl flex flex-col gap-3">
-      <div ref={hostRef} className="w-full aspect-video border-[3px] border-ink rounded-md overflow-hidden bg-ink shadow-[0_0_0_3px_#fff4d6]" />
+    <div
+      ref={stageRef}
+      className={
+        expanded
+          ? "fixed inset-0 z-[60] bg-ink flex flex-col items-center justify-center gap-2 p-2"
+          : "w-full min-w-0 max-w-6xl flex flex-col gap-3"
+      }
+    >
+      {/* the canvas is taken out of the layout flow (absolute): otherwise the box and Phaser keep
+          resizing each other and the stage grows wider than a phone screen */}
+      <div
+        ref={hostRef}
+        className="relative min-w-0 aspect-video border-[3px] border-ink rounded-md overflow-hidden bg-ink shadow-[0_0_0_3px_#fff4d6] [&>canvas]:absolute [&>canvas]:left-0 [&>canvas]:top-0"
+        style={{ width: expanded ? "min(100%, calc((100dvh - 64px) * 16 / 9))" : "100%" }}
+      />
       <div className="flex justify-center gap-2">
         <button
           className="pixel-btn btn-small btn-white"
@@ -398,8 +446,11 @@ export function DuelStage({
         <button className="pixel-btn btn-small btn-white" onClick={() => onFinished(winnerId)}>
           ⏭ Pular
         </button>
+        <button className="pixel-btn btn-small btn-white" onClick={() => void toggleFull()}>
+          {expanded ? "✕ Sair da tela cheia" : "⛶ Tela cheia"}
+        </button>
       </div>
-      <p className="sm:hidden text-center text-xs text-white/70">Dica: deite o celular para ver maior.</p>
+      {!expanded && <p className="sm:hidden text-center text-xs text-white/70">Dica: toque em Tela cheia e deite o celular.</p>}
     </div>
   );
 }

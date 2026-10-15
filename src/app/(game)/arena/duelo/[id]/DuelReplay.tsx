@@ -29,7 +29,7 @@ export function DuelReplay({ you, foe, events, winnerName }: { you: DuelFighter;
   }
 
   return (
-    <div className="grid gap-3 bg-ink p-2 sm:p-4 rounded-md">
+    <div className="grid gap-3 min-w-0 bg-ink p-2 sm:p-4 rounded-md">
       <DuelStage you={you} foe={foe} events={run} onFinished={() => setDone(true)} />
       {done && (
         <div className="flex flex-wrap justify-center items-center gap-3 text-white">
