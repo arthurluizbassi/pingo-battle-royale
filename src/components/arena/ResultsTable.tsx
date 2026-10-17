@@ -2,8 +2,9 @@ import Link from "next/link";
 import { ItemIcon } from "@/components/pingo/ItemIcon";
 import { PingoAvatar } from "@/components/pingo/PingoAvatar";
 import type { ParticipantRow, ProfileRow } from "@/lib/db-types";
+import { Icon } from "@/components/pixel/Icon";
 
-const MEDAL = ["🥇", "🥈", "🥉"];
+const MEDAL = ["medalGold", "medalSilver", "medalBronze"] as const;
 
 /** Post-battle stats. `showPower` is teacher-only (power score is an analysis tool, not a student stat). */
 export function ResultsTable({
@@ -23,7 +24,7 @@ export function ResultsTable({
             <th className="p-2">#</th>
             <th className="p-2">Pingo</th>
             <th className="p-2">Equipamentos</th>
-            <th className="p-2 text-right" title="Eliminações">💀</th>
+            <th className="p-2 text-right" title="Eliminações"><Icon name="skull" /></th>
             <th className="p-2 text-right" title="Dano causado">Dano</th>
             <th className="p-2 text-right" title="Dano recebido">Recebido</th>
             <th className="p-2 text-right" title="Críticos">Crít.</th>
@@ -37,7 +38,7 @@ export function ResultsTable({
             const snap = row.snapshot;
             return (
               <tr key={row.profile_id} className={`border-t-2 border-ink/10 ${row.placement === 1 ? "bg-[#fff6c9]" : ""}`}>
-                <td className="p-2 font-pixel text-lg">{MEDAL[(row.placement ?? 0) - 1] ?? `${row.placement}º`}</td>
+                <td className="p-2 font-pixel text-lg">{MEDAL[(row.placement ?? 0) - 1] ? <Icon name={MEDAL[(row.placement ?? 0) - 1]} /> : `${row.placement}º`}</td>
                 <td className="p-2">
                   <div className="flex items-center gap-2">
                     {snap && (

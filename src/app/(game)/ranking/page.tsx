@@ -6,6 +6,7 @@ import { lookFromPingo } from "@/lib/snapshot";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/server/auth";
 import { getClassmates, getSeasonRanking } from "@/server/queries";
+import { Icon } from "@/components/pixel/Icon";
 
 export default async function RankingPage({ searchParams }: { searchParams: Promise<{ temporada?: string }> }) {
   const session = await requireUser();
@@ -27,7 +28,7 @@ export default async function RankingPage({ searchParams }: { searchParams: Prom
   return (
     <div className="grid gap-4">
       <div className="flex flex-wrap items-end gap-3">
-        <h1 className="font-pixel text-3xl">🏆 Ranking</h1>
+        <h1 className="font-pixel text-3xl"><Icon name="trophy" /> Ranking</h1>
         <div className="flex flex-wrap gap-1 ml-auto">
           {(seasons ?? []).map((s) => (
             <Link key={s.id} href={`/ranking?temporada=${s.id}`} className={`pixel-btn btn-small ${s.id === season?.id ? "" : "btn-white"}`}>
@@ -51,7 +52,7 @@ export default async function RankingPage({ searchParams }: { searchParams: Prom
             const me = r.profileId === session.userId;
             return (
               <li key={r.profileId} className={`pixel-panel p-2 sm:p-3 flex items-center gap-3 ${me ? "ring-4 ring-bubble" : ""} ${i === 0 ? "bg-[#fff6c9]" : ""}`}>
-                <span className="font-pixel text-2xl w-10 text-center">{i === 0 ? "👑" : `${i + 1}º`}</span>
+                <span className="font-pixel text-2xl w-10 text-center">{i === 0 ? <Icon name="crown" /> : `${i + 1}º`}</span>
                 {mate && (
                   <PingoAvatar look={lookFromPingo(mate.pingo)} gear={mate.loadout} size={56} animated={i === 0} shadow={false} />
                 )}
@@ -63,9 +64,9 @@ export default async function RankingPage({ searchParams }: { searchParams: Prom
                 </div>
                 <div className="ml-auto grid grid-cols-2 sm:grid-cols-4 gap-x-4 text-right text-sm">
                   <span className="font-pixel text-lg sm:order-last">{r.points} pts</span>
-                  <span title="Vitórias">🏆 {r.wins}</span>
-                  <span title="Pódios" className="hidden sm:inline">🥉 {r.podiums}</span>
-                  <span title="Eliminações" className="hidden sm:inline">💀 {r.kills}</span>
+                  <span title="Vitórias"><Icon name="trophy" /> {r.wins}</span>
+                  <span title="Pódios" className="hidden sm:inline"><Icon name="medalBronze" /> {r.podiums}</span>
+                  <span title="Eliminações" className="hidden sm:inline"><Icon name="skull" /> {r.kills}</span>
                 </div>
               </li>
             );

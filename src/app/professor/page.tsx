@@ -7,6 +7,7 @@ import { formatDateTime } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { requireTeacher } from "@/server/auth";
 import { getActiveSeason, getNextBattle } from "@/server/queries";
+import { Icon } from "@/components/pixel/Icon";
 
 export default async function TeacherHome() {
   const session = await requireTeacher();
@@ -27,11 +28,11 @@ export default async function TeacherHome() {
 
   return (
     <div className="grid gap-4">
-      <h1 className="font-pixel text-3xl">Olá, {session.profile.display_name}! 👋</h1>
+      <h1 className="font-pixel text-3xl">Olá, {session.profile.display_name}! <Icon name="wave" /></h1>
       <p className="text-muted -mt-2">Turma: {klass?.name}</p>
       {pendingCount > 0 && (
         <Link href="/professor/alunos" className="pixel-panel bg-[#fff6c9] px-4 py-3 font-bold hover:-translate-y-0.5 transition-transform">
-          🙋 {pendingCount} {pendingCount === 1 ? "aluno aguardando" : "alunos aguardando"} a sua aprovação →
+          <Icon name="handRaised" /> {pendingCount} {pendingCount === 1 ? "aluno aguardando" : "alunos aguardando"} a sua aprovação →
         </Link>
       )}
       <div className="grid gap-3 sm:grid-cols-3">
@@ -67,7 +68,7 @@ export default async function TeacherHome() {
               </Link>
               <span className="text-sm text-muted">{formatDateTime(nextBattle.scheduled_at)}</span>
               <span className="text-sm">
-                Status: {nextBattle.status === "locked" ? "🔒 loadouts travados — pronto para START" : "inscrições abertas"}
+                Status: {nextBattle.status === "locked" ? <><Icon name="lock" /> loadouts travados — pronto para START</> : "inscrições abertas"}
               </span>
             </div>
           ) : (

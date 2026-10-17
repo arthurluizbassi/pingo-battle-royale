@@ -4,6 +4,7 @@ import { formatDateTime } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { requireTeacher } from "@/server/auth";
 import { SeasonControls } from "./SeasonControls";
+import { Icon } from "@/components/pixel/Icon";
 
 export default async function SeasonsPage() {
   const session = await requireTeacher();
@@ -18,11 +19,11 @@ export default async function SeasonsPage() {
 
   return (
     <div className="grid gap-4">
-      <h1 className="font-pixel text-3xl">🏆 Temporadas</h1>
+      <h1 className="font-pixel text-3xl"><Icon name="trophy" /> Temporadas</h1>
       <Card title="Temporada ativa">
         <SeasonControls active={active ? { id: active.id, name: active.name } : null} suggestedName={`Temporada ${(seasons?.length ?? 0) + 1}`} />
         <p className="text-xs text-muted mt-2">
-          Cada Battle Royale criado entra na temporada ativa. Ao encerrar, o líder do ranking ganha um troféu 👑 (só cosmético).
+          Cada Battle Royale criado entra na temporada ativa. Ao encerrar, o líder do ranking ganha um troféu <Icon name="crown" /> (só cosmético).
         </p>
       </Card>
       <Card title="Todas as temporadas">

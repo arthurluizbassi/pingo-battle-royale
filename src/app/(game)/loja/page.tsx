@@ -4,6 +4,7 @@ import { requireStudent } from "@/server/auth";
 import { getStudentState } from "@/server/queries";
 import { getCurrentRotation } from "@/server/shop";
 import { ShopView } from "./ShopView";
+import { Icon } from "@/components/pixel/Icon";
 
 export default async function ShopPage() {
   const session = await requireStudent();
@@ -16,7 +17,7 @@ export default async function ShopPage() {
     <div className="grid gap-4">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h1 className="font-pixel text-3xl">🛒 Loja</h1>
+          <h1 className="font-pixel text-3xl"><Icon name="cart" /> Loja</h1>
           <p className="text-sm text-muted">
             Compra direta, sem sorteio: você vê exatamente o que leva.
             {rotation?.ends_at && <> Estoque muda em {formatDateTime(rotation.ends_at)}.</>}

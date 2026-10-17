@@ -3,6 +3,7 @@ import { logout } from "@/server/actions/auth";
 import { requireTeacher } from "@/server/auth";
 import { syncCatalogIfNeeded } from "@/server/catalog";
 import { TeacherNav } from "./TeacherNav";
+import { Icon } from "@/components/pixel/Icon";
 
 export default async function TeacherLayout({ children }: { children: React.ReactNode }) {
   const session = await requireTeacher();
@@ -15,7 +16,7 @@ export default async function TeacherLayout({ children }: { children: React.Reac
             Pingo <span className="text-sun">Royale</span> <span className="text-xs opacity-70">· Professor</span>
           </Link>
           <Link href="/arena" className="ml-auto pixel-btn btn-small">
-            ⚔️ Arena (projetor)
+            <Icon name="swords" /> Arena (projetor)
           </Link>
           <span className="hidden sm:inline text-sm opacity-80">{session.profile.display_name}</span>
           <form action={logout}>

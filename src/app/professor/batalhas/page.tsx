@@ -5,6 +5,7 @@ import { formatDateTime } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { requireTeacher } from "@/server/auth";
 import { CreateBattleForm } from "./CreateBattleForm";
+import { Icon, PixelText } from "@/components/pixel/Icon";
 
 const STATUS_LABEL: Record<BattleRow["status"], string> = {
   scheduled: "📝 inscrições abertas",
@@ -26,7 +27,7 @@ export default async function BattlesPage() {
 
   return (
     <div className="grid gap-4">
-      <h1 className="font-pixel text-3xl">⚔️ Battle Royales</h1>
+      <h1 className="font-pixel text-3xl"><Icon name="swords" /> Battle Royales</h1>
       <Card title="Criar Battle Royale">
         <CreateBattleForm defaultName={`Pingo Royale #${nextNumber}`} />
       </Card>
@@ -36,9 +37,9 @@ export default async function BattlesPage() {
             <li key={b.id}>
               <Link href={`/professor/batalhas/${b.id}`} className="flex flex-wrap items-center gap-3 rounded-md border-2 border-ink/20 hover:border-ink px-3 py-2">
                 <b>{b.name}</b>
-                <span className="text-sm">{STATUS_LABEL[b.status]}</span>
+                <span className="text-sm"><PixelText text={STATUS_LABEL[b.status]} /></span>
                 <span className="text-sm text-muted">{formatDateTime(b.scheduled_at ?? b.created_at)}</span>
-                {b.prize_text && <span className="text-sm">🎁 {b.prize_text}</span>}
+                {b.prize_text && <span className="text-sm"><Icon name="gift" /> <PixelText text={b.prize_text} /></span>}
                 <span className="ml-auto text-sm underline">Gerenciar →</span>
               </Link>
             </li>

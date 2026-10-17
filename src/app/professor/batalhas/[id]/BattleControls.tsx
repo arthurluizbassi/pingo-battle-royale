@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import { Card, Feedback } from "@/components/ui/Card";
 import type { BattleStatus } from "@/lib/db-types";
 import { cancelBattle, lockBattleAction, startBattleAction, verifyReplay } from "@/server/actions/teacher";
+import { Icon } from "@/components/pixel/Icon";
 
 const STEPS: Array<{ status: BattleStatus; label: string }> = [
   { status: "scheduled", label: "1. Inscrições" },
@@ -51,7 +52,7 @@ export function BattleControls({ battleId, status, participantCount }: { battleI
               run(() => lockBattleAction(battleId))
             }
           >
-            🔒 LOCK LOADOUTS
+            <Icon name="lock" /> LOCK LOADOUTS
           </button>
         )}
         {status === "locked" && (
@@ -60,16 +61,16 @@ export function BattleControls({ battleId, status, participantCount }: { battleI
             disabled={pending}
             onClick={() => confirm("Iniciar a batalha? O servidor vai gerar a seed e simular tudo agora.") && run(() => startBattleAction(battleId))}
           >
-            {pending ? "Simulando..." : "▶ START BATTLE"}
+            {pending ? "Simulando..." : <><Icon name="play" /> START BATTLE</>}
           </button>
         )}
         {status === "finished" && (
           <>
             <Link href={`/arena/${battleId}`} className="pixel-btn btn-pink text-lg">
-              ▶ Assistir replay
+              <Icon name="play" /> Assistir replay
             </Link>
             <button className="pixel-btn btn-small btn-white" disabled={pending} onClick={() => run(() => verifyReplay(battleId))}>
-              🔁 Verificar reprodutibilidade
+              <Icon name="repeat" /> Verificar reprodutibilidade
             </button>
           </>
         )}

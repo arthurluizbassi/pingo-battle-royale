@@ -10,6 +10,7 @@ import { useScrollIntoViewOnMobile } from "@/components/ui/useScrollIntoViewOnMo
 import { buyItem, equipItem } from "@/server/actions/student";
 import type { StatPoints } from "@/lib/levels";
 import type { PingoLook } from "@/sprites/compose";
+import { Icon, Stars } from "@/components/pixel/Icon";
 
 const TABS: Array<{ id: ItemCategory | "all"; label: string }> = [
   { id: "all", label: "Tudo" },
@@ -96,7 +97,7 @@ export function ShopView({
 
         {feedback && (
           <div className={`pixel-panel px-3 py-2 pop-in flex items-center gap-2 ${feedback.ok ? "bg-[#e5f8e2]" : "bg-[#fde0e0]"}`} role="status">
-            <span className="font-bold">{feedback.ok ? "✅" : "⚠️"} {feedback.text}</span>
+            <span className="font-bold"><Icon name={feedback.ok ? "check" : "warning"} /> {feedback.text}</span>
             {feedback.itemId && !Object.values(loadout).includes(feedback.itemId) && (
               <button className="pixel-btn btn-mint btn-small ml-auto" disabled={pending} onClick={() => equip(getItem(feedback.itemId)!)}>
                 Equipar agora
@@ -121,7 +122,7 @@ export function ShopView({
                   <ItemIcon category={item.category} sprite={item.sprite} tier={item.tier} size={60} name={item.name} />
                   <div className="min-w-0">
                     <p className="font-pixel text-[11px] text-muted">
-                      {CATEGORY_LABEL[item.category]} · {"★".repeat(item.tier)}
+                      {CATEGORY_LABEL[item.category]} · <Stars n={item.tier} />
                     </p>
                     <p className="font-bold leading-tight">{item.name}</p>
                     <Coins amount={item.price} size="sm" />

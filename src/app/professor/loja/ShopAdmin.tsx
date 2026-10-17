@@ -9,6 +9,7 @@ import { Coins } from "@/components/ui/Coins";
 import { ALL_ITEMS, CATEGORY_LABEL, type ItemCategory } from "@/content/items";
 import { EFFECT_NAME } from "@/lib/format";
 import { forceRotation, setManualRotation, updateShopSettings } from "@/server/actions/teacher";
+import { Icon, Stars } from "@/components/pixel/Icon";
 
 export function ShopAdmin({
   settings,
@@ -65,14 +66,14 @@ export function ShopAdmin({
 
       <div className="flex flex-wrap items-center gap-2">
         <button className="pixel-btn btn-small" disabled={pending} onClick={() => run(forceRotation)}>
-          🎲 Sortear nova rotação agora
+          <Icon name="dice" /> Sortear nova rotação agora
         </button>
         <button
           className="pixel-btn btn-small btn-grape"
           disabled={pending || selection.size === 0}
           onClick={() => run(() => setManualRotation([...selection]))}
         >
-          📌 Publicar seleção manual ({selection.size})
+          <Icon name="pin" /> Publicar seleção manual ({selection.size})
         </button>
         <Feedback result={result} />
       </div>
@@ -118,7 +119,7 @@ export function ShopAdmin({
                     </div>
                   </div>
                 </td>
-                <td className="p-2">{"★".repeat(item.tier)}</td>
+                <td className="p-2"><Stars n={item.tier} /></td>
                 <td className="p-2">
                   <Coins amount={item.price} size="sm" />
                 </td>

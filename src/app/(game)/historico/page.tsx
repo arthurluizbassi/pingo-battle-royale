@@ -4,6 +4,7 @@ import type { BattleRow, ParticipantRow, TransactionRow } from "@/lib/db-types";
 import { formatDateTime } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { requireStudent } from "@/server/auth";
+import { Icon } from "@/components/pixel/Icon";
 
 export default async function HistoryPage() {
   const session = await requireStudent();
@@ -25,7 +26,7 @@ export default async function HistoryPage() {
 
   return (
     <div className="grid gap-5">
-      <h1 className="font-pixel text-3xl">📜 Histórico</h1>
+      <h1 className="font-pixel text-3xl"><Icon name="scroll" /> Histórico</h1>
       <section className="pixel-panel p-4">
         <h2 className="font-pixel text-xl mb-2">Minhas batalhas</h2>
         {(battles ?? []).length === 0 ? (
@@ -36,10 +37,10 @@ export default async function HistoryPage() {
               const me = (parts ?? []).find((p) => p.battle_id === b.id);
               return (
                 <li key={b.id} className="flex flex-wrap items-center gap-3 pixel-inset bg-white px-3 py-2">
-                  <span className="font-pixel text-xl w-12">{me?.placement === 1 ? "🏆" : `${me?.placement}º`}</span>
+                  <span className="font-pixel text-xl w-12">{me?.placement === 1 ? <Icon name="trophy" /> : `${me?.placement}º`}</span>
                   <span className="font-bold">{b.name}</span>
                   <span className="text-sm text-muted">{formatDateTime(b.finished_at)}</span>
-                  <span className="text-sm">💀 {me?.kills} · 💥 {me?.damage_dealt}</span>
+                  <span className="text-sm"><Icon name="skull" /> {me?.kills} · <Icon name="explosion" /> {me?.damage_dealt}</span>
                   <Link href={`/arena/${b.id}`} className="ml-auto text-sm underline">
                     Replay
                   </Link>

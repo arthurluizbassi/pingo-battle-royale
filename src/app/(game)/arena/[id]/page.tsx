@@ -7,6 +7,7 @@ import { formatDateTime } from "@/lib/format";
 import { lookFromPingo } from "@/lib/snapshot";
 import { requireUser } from "@/server/auth";
 import { getBattle, getEvents, getParticipants, replayParticipant } from "@/server/battle-queries";
+import { Icon, PixelText } from "@/components/pixel/Icon";
 
 export default async function BattlePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -22,10 +23,10 @@ export default async function BattlePage({ params }: { params: Promise<{ id: str
         <AutoRefresh seconds={8} />
         <div className="pixel-panel p-5 text-center grid gap-2 justify-items-center">
           <h1 className="font-pixel text-3xl">{battle.name}</h1>
-          {battle.prize_text && <p className="pixel-inset bg-white px-3 py-1">🎁 {battle.prize_text}</p>}
+          {battle.prize_text && <p className="pixel-inset bg-white px-3 py-1"><Icon name="gift" /> <PixelText text={battle.prize_text} /></p>}
           <p className="text-lg">
             {battle.status === "locked"
-              ? "🔒 Loadouts travados! Aguardando o professor iniciar a batalha…"
+              ? <><Icon name="lock" /> Loadouts travados! Aguardando o professor iniciar a batalha…</>
               : "Inscrições abertas. Ajuste seus equipamentos antes do professor travar os loadouts!"}
           </p>
           {battle.scheduled_at && <p className="text-muted">Marcada para {formatDateTime(battle.scheduled_at)}</p>}
@@ -72,7 +73,7 @@ export default async function BattlePage({ params }: { params: Promise<{ id: str
           {formatDateTime(battle.finished_at)} · seed {battle.seed}
         </span>
         <Link href={`/arena/${battle.id}/resultado`} className="pixel-btn btn-small btn-white ml-auto">
-          📊 Resultado
+          <Icon name="chart" /> Resultado
         </Link>
       </div>
       <ArenaReplay

@@ -7,6 +7,7 @@ import { NEW_PROGRESS } from "@/lib/levels";
 import { requireUser } from "@/server/auth";
 import { schoolDay } from "@/server/duels";
 import { getClassProgress, getClassmates, getMyDuels } from "@/server/queries";
+import { Icon } from "@/components/pixel/Icon";
 
 /** Duels against classmates: the server picks the opponent and saves the XP. */
 export default async function DuelPage({ searchParams }: { searchParams: Promise<{ buscar?: string }> }) {
@@ -41,7 +42,7 @@ export default async function DuelPage({ searchParams }: { searchParams: Promise
       )}
 
       <section className="pixel-panel p-4">
-        <h2 className="font-pixel text-lg mb-2">📜 Últimos duelos</h2>
+        <h2 className="font-pixel text-lg mb-2"><Icon name="scroll" /> Últimos duelos</h2>
         {duels.length === 0 ? (
           <p className="text-sm text-muted">Nenhum duelo ainda. Que tal o primeiro?</p>
         ) : (
@@ -61,13 +62,13 @@ export default async function DuelPage({ searchParams }: { searchParams: Promise
                       </>
                     ) : (
                       <>
-                        🛡️ <b>{other}</b> desafiou você
+                        <Icon name="shield" /> <b>{other}</b> desafiou você
                       </>
                     )}
                     <span className="block text-xs text-muted">{formatDateTime(d.created_at)}</span>
                   </span>
                   <Link href={`/arena/duelo/${d.id}`} className="pixel-btn btn-small btn-white">
-                    ▶ Assistir
+                    <Icon name="play" /> Assistir
                   </Link>
                 </li>
               );

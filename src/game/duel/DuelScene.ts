@@ -2,7 +2,8 @@ import type Phaser from "phaser";
 import type { BattleEvent } from "@/engine";
 import { HAND_ROWS } from "@/sprites/data/base";
 import { composeItemIcon, composePingo, type Grid, type PingoLook } from "@/sprites/compose";
-import { BODY_COLORS } from "@/sprites/palette";
+import { ICONS } from "@/sprites/icons";
+import { BODY_COLORS, PALETTE } from "@/sprites/palette";
 import { WEAPON_ART, gearFromSprites, type GearSprites } from "@/sprites/items";
 import { sfx, startMusic, stopMusic } from "./sfx";
 import { weaponFx, type Debris, type WeaponFx } from "./weapon-fx";
@@ -191,6 +192,8 @@ export function mountDuel(PhaserLib: typeof Phaser, parent: HTMLElement, data: D
       drawPixels(this, "bolt", ["..yy", ".yy.", "yyyy", ".yy.", "yy..", "y..."], { y: "#ffd23f" });
       drawPixels(this, "wifi", [".ccccc.", "c.....c", "..ccc..", ".c...c.", "...c..."], { c: "#5ad1e6" });
       drawPixels(this, "smoke", [".ggg.", "ggggg", "ggggg", ".ggg."], { g: "#c9c3d2" });
+      // the same pixel icon the UI uses (an emoji note would look different on every device)
+      drawPixels(this, "note-icon", ICONS.note.rows, PALETTE);
       drawPixels(this, "cloud", ["....wwww......", "..wwwwwwww.ww.", ".wwwwwwwwwwwww", "wwwwwwwwwwwwww", ".WWWWWWWWWWWW."], { w: "#ffffff", W: "#dfe8ff" });
 
       // crowd heads: little Pingos in every body color
@@ -964,7 +967,7 @@ export function mountDuel(PhaserLib: typeof Phaser, parent: HTMLElement, data: D
           gravity = 100;
           break;
         case "notes":
-          obj = this.text(x, y, pick(["♪", "♫", "♬"]), 30, pick(["#ffd23f", "#ff6fa8", "#ffffff"]), 5);
+          obj = this.add.image(x, y, "note-icon").setScale(2.5);
           gravity = 80;
           flutter = 3;
           break;

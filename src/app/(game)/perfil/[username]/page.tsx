@@ -9,6 +9,8 @@ import { lookFromPingo } from "@/lib/snapshot";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/server/auth";
 import { loadoutFromRows } from "@/server/queries";
+import { Icon, PixelText } from "@/components/pixel/Icon";
+import type { IconName } from "@/sprites/icons";
 
 export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
@@ -59,13 +61,13 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
       <div className="grid gap-4 content-start">
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
-            ["🏆", "Vitórias", wins],
-            ["🎯", "Melhor colocação", best ? `${best}º` : "—"],
-            ["💀", "Eliminações", kills],
-            ["⚔️", "Batalhas", results.length],
+            ["trophy", "Vitórias", wins],
+            ["target", "Melhor colocação", best ? `${best}º` : "—"],
+            ["skull", "Eliminações", kills],
+            ["swords", "Batalhas", results.length],
           ].map(([icon, label, value]) => (
             <div key={String(label)} className="pixel-panel p-3 text-center">
-              <p className="text-2xl">{icon}</p>
+              <p className="text-2xl"><Icon name={icon as IconName} /></p>
               <p className="font-pixel text-2xl">{value}</p>
               <p className="text-xs text-muted">{label}</p>
             </div>
@@ -80,7 +82,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
             <ul className="grid gap-1">
               {(trophies ?? []).map((t) => (
                 <li key={t.id} className="pixel-inset bg-white px-2 py-1">
-                  {t.label}
+                  <PixelText text={t.label} />
                 </li>
               ))}
             </ul>
@@ -97,12 +99,12 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
                 const r = results.find((p) => p.battle_id === b.id);
                 return (
                   <li key={b.id} className="flex items-center gap-3 text-sm">
-                    <span className="font-pixel w-10">{r?.placement === 1 ? "🏆" : `${r?.placement}º`}</span>
+                    <span className="font-pixel w-10">{r?.placement === 1 ? <Icon name="trophy" /> : `${r?.placement}º`}</span>
                     <Link href={`/arena/${b.id}`} className="underline">
                       {b.name}
                     </Link>
                     <span className="text-muted">{formatDateTime(b.finished_at)}</span>
-                    <span className="ml-auto">💀 {r?.kills}</span>
+                    <span className="ml-auto"><Icon name="skull" /> {r?.kills}</span>
                   </li>
                 );
               })}

@@ -10,6 +10,7 @@ import { getBattle, getParticipants } from "@/server/battle-queries";
 import { getClassmates } from "@/server/queries";
 import { BattleControls } from "./BattleControls";
 import { ParticipantPicker } from "./ParticipantPicker";
+import { Icon, PixelText } from "@/components/pixel/Icon";
 
 export default async function ManageBattlePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,11 +26,11 @@ export default async function ManageBattlePage({ params }: { params: Promise<{ i
         <div>
           <h1 className="font-pixel text-3xl leading-none">{battle.name}</h1>
           <p className="text-muted text-sm mt-1">
-            {formatDateTime(battle.scheduled_at)} {battle.prize_text && `· 🎁 ${battle.prize_text}`}
+            {formatDateTime(battle.scheduled_at)} {battle.prize_text && <> · <Icon name="gift" /> <PixelText text={battle.prize_text} /></>}
           </p>
         </div>
         <Link href={`/arena/${battle.id}`} className="pixel-btn btn-small ml-auto">
-          ⚔️ Abrir na Arena (projetor)
+          <Icon name="swords" /> Abrir na Arena (projetor)
         </Link>
       </div>
 
@@ -67,7 +68,7 @@ export default async function ManageBattlePage({ params }: { params: Promise<{ i
                     />
                     <b>{snap?.pingoName}</b>
                     <span className="text-muted">{snap?.displayName}</span>
-                    <span title="Power score estimado">⚡ {row.power_score}</span>
+                    <span title="Power score estimado"><Icon name="bolt" /> {row.power_score}</span>
                   </li>
                 );
               })}
@@ -82,7 +83,7 @@ export default async function ManageBattlePage({ params }: { params: Promise<{ i
               {battle.summary.funStats.map((s) => (
                 <Card key={s.title}>
                   <p className="font-pixel">
-                    {s.emoji} {s.title}
+                    <PixelText text={s.emoji} /> {s.title}
                   </p>
                   <p className="text-sm">{s.text}</p>
                 </Card>

@@ -13,6 +13,7 @@ import { getActiveSeason, getNextBattle, getSeasonRanking, getStudentState } fro
 import { statsWithLevel } from "@/lib/levels";
 import { DashboardPingo } from "./DashboardPingo";
 import { LevelCard } from "./LevelCard";
+import { Icon, PixelText } from "@/components/pixel/Icon";
 
 const SLOTS: ItemCategory[] = ["weapon", "helmet", "outfit"];
 
@@ -61,7 +62,7 @@ export default async function MyPingoPage() {
             <Coins amount={state.balance} size="sm" showName />
           </span>
           <Link href="/pingo/editar" className="pixel-btn btn-small btn-white">
-            ✏️ Personalizar
+            <Icon name="pencil" /> Personalizar
           </Link>
         </div>
         <DashboardPingo
@@ -95,11 +96,11 @@ export default async function MyPingoPage() {
       {/* ---- side column ---- */}
       <div className="grid gap-5 content-start">
         <Link href="/arena/duelo?buscar" className="pixel-btn btn-pink text-2xl py-4">
-          ⚔️ Encontrar Batalha
+          <Icon name="swords" /> Encontrar Batalha
         </Link>
         <LevelCard progress={progress} stats={stats} />
         <section className="pixel-panel p-4">
-          <h2 className="font-pixel text-lg mb-2">⚔️ Próximo Battle Royale</h2>
+          <h2 className="font-pixel text-lg mb-2"><Icon name="swords" /> Próximo Battle Royale</h2>
           {nextBattle ? (
             <div className="grid gap-2">
               <p className="font-bold">{nextBattle.name}</p>
@@ -109,13 +110,13 @@ export default async function MyPingoPage() {
                   <Countdown to={nextBattle.scheduled_at} />
                 </>
               )}
-              {nextBattle.prize_text && <p className="pixel-inset bg-white px-2 py-1 text-sm">🎁 {nextBattle.prize_text}</p>}
+              {nextBattle.prize_text && <p className="pixel-inset bg-white px-2 py-1 text-sm"><Icon name="gift" /> <PixelText text={nextBattle.prize_text} /></p>}
               <p className="text-sm">
                 {!enrolled
                   ? "Você não está inscrito nesta batalha."
                   : nextBattle.status === "locked"
-                    ? "🔒 Loadouts travados! Seu equipamento para esta batalha está definido."
-                    : "✅ Inscrito! Ajuste seus equipamentos antes do professor travar os loadouts."}
+                    ? <><Icon name="lock" /> Loadouts travados! Seu equipamento para esta batalha está definido.</>
+                    : <><Icon name="check" /> Inscrito! Ajuste seus equipamentos antes do professor travar os loadouts.</>}
               </p>
             </div>
           ) : (
@@ -124,7 +125,7 @@ export default async function MyPingoPage() {
         </section>
 
         <section className="pixel-panel p-4">
-          <h2 className="font-pixel text-lg mb-3">📊 Atributos</h2>
+          <h2 className="font-pixel text-lg mb-3"><Icon name="chart" /> Atributos</h2>
           <StatTable stats={stats} compact />
           <Link href="/inventario" className="text-sm underline mt-3 inline-block">
             Testar outras combinações →
@@ -132,7 +133,7 @@ export default async function MyPingoPage() {
         </section>
 
         <section className="pixel-panel p-4">
-          <h2 className="font-pixel text-lg mb-2">🏆 {season?.name ?? "Temporada"}</h2>
+          <h2 className="font-pixel text-lg mb-2"><Icon name="trophy" /> {season?.name ?? "Temporada"}</h2>
           {season ? (
             myRank >= 0 ? (
               <p>
@@ -148,7 +149,7 @@ export default async function MyPingoPage() {
           {(trophies ?? []).length > 0 && (
             <ul className="mt-2 text-sm grid gap-1">
               {(trophies ?? []).map((t) => (
-                <li key={t.id}>{t.label}</li>
+                <li key={t.id}><PixelText text={t.label} /></li>
               ))}
             </ul>
           )}

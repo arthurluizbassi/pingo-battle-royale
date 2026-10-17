@@ -3,6 +3,7 @@ import { formatDateTime } from "@/lib/format";
 import type { BattleRow, ProfileRow } from "@/lib/db-types";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/server/auth";
+import { Icon, PixelText } from "@/components/pixel/Icon";
 
 const STATUS: Record<BattleRow["status"], { label: string; className: string }> = {
   scheduled: { label: "Inscrições abertas", className: "bg-mint" },
@@ -31,7 +32,7 @@ export default async function ArenaListPage() {
 
   return (
     <div className="grid gap-5">
-      <h1 className="font-pixel text-3xl">⚔️ Arena</h1>
+      <h1 className="font-pixel text-3xl"><Icon name="swords" /> Arena</h1>
 
       <section className="grid gap-3">
         <h2 className="font-pixel text-xl">Próximas batalhas</h2>
@@ -39,9 +40,9 @@ export default async function ArenaListPage() {
         {upcoming.map((b) => (
           <Link key={b.id} href={`/arena/${b.id}`} className="pixel-panel p-4 flex flex-wrap items-center gap-3 hover:-translate-y-0.5 transition-transform">
             <span className="font-pixel text-xl">{b.name}</span>
-            <span className={`pixel-chip ${STATUS[b.status].className}`}>{STATUS[b.status].label}</span>
+            <span className={`pixel-chip ${STATUS[b.status].className}`}><PixelText text={STATUS[b.status].label} /></span>
             {b.scheduled_at && <span className="text-sm text-muted">{formatDateTime(b.scheduled_at)}</span>}
-            {b.prize_text && <span className="text-sm">🎁 {b.prize_text}</span>}
+            {b.prize_text && <span className="text-sm"><Icon name="gift" /> <PixelText text={b.prize_text} /></span>}
             <span className="ml-auto font-pixel text-sm">Abrir →</span>
           </Link>
         ))}
@@ -54,7 +55,7 @@ export default async function ArenaListPage() {
           {past.map((b) => (
             <li key={b.id}>
               <Link href={`/arena/${b.id}`} className="pixel-panel p-3 flex items-center gap-3 hover:-translate-y-0.5 transition-transform">
-                <span className="text-2xl">🏆</span>
+                <span className="text-2xl"><Icon name="trophy" /></span>
                 <span className="min-w-0">
                   <span className="font-pixel block">{b.name}</span>
                   <span className="text-sm text-muted">
@@ -62,7 +63,7 @@ export default async function ArenaListPage() {
                     <b>{(winners ?? []).find((w) => w.id === b.winner_id)?.display_name ?? "?"}</b>
                   </span>
                 </span>
-                <span className="ml-auto font-pixel text-sm whitespace-nowrap">▶ Replay</span>
+                <span className="ml-auto font-pixel text-sm whitespace-nowrap"><Icon name="play" /> Replay</span>
               </Link>
             </li>
           ))}

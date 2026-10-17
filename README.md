@@ -138,3 +138,9 @@ O prêmio físico (chocolate, etc.) é só um texto informativo no evento. A pla
 | `db:migrate`, `db:check` | banco (Postgres via `SUPABASE_DB_URL`) |
 | `seed`, `create-teacher` | dados |
 | `sprites:export`, `sprites:base` | assets pixel art |
+
+## Créditos
+
+- Ícones da interface: pixel art 16×16 em `src/sprites/icons.ts` (prévia: `npx tsx scripts/icons-preview.ts`).
+  Seis deles (escudo, olá, ajuste, alfinete, susto, esquiva) foram derivados do
+  [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) © Microsoft, licença MIT — ver `licenses/fluentui-emoji.txt`.

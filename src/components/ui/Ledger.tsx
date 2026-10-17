@@ -1,3 +1,4 @@
+import { PixelText } from "@/components/pixel/Icon";
 import { Coins } from "@/components/ui/Coins";
 import { formatDateTime } from "@/lib/format";
 import type { TransactionRow } from "@/lib/db-types";
@@ -30,7 +31,7 @@ export function Ledger({ rows, names }: { rows: TransactionRow[]; names?: Record
             <tr key={t.id} className="border-b border-ink/10">
               <td className="p-2 whitespace-nowrap text-muted">{formatDateTime(t.created_at)}</td>
               {names && <td className="p-2">{names[t.owner_id] ?? "?"}</td>}
-              <td className="p-2 whitespace-nowrap">{TYPE_LABEL[t.type]}</td>
+              <td className="p-2 whitespace-nowrap"><PixelText text={TYPE_LABEL[t.type]} /></td>
               <td className="p-2">{t.reason}</td>
               <td className={`p-2 text-right font-pixel ${t.amount > 0 ? "text-leaf" : "text-tomato"}`}>
                 {t.amount > 0 ? "+" : ""}

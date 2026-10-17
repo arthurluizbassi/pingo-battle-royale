@@ -4,6 +4,7 @@ import type { ProfileRow, TransactionRow } from "@/lib/db-types";
 import { createClient } from "@/lib/supabase/server";
 import { requireTeacher } from "@/server/auth";
 import { BatchRewardForm } from "./BatchRewardForm";
+import { Icon } from "@/components/pixel/Icon";
 
 export default async function CoinsPage() {
   const session = await requireTeacher();
@@ -24,7 +25,7 @@ export default async function CoinsPage() {
 
   return (
     <div className="grid gap-4">
-      <h1 className="font-pixel text-3xl">💰 Moedas</h1>
+      <h1 className="font-pixel text-3xl"><Icon name="coinBag" /> Moedas</h1>
       <Card title="Distribuir recompensa de atividade">
         <BatchRewardForm
           students={(students ?? []).map((s) => ({

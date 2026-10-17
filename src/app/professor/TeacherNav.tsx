@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Icon } from "@/components/pixel/Icon";
+import type { IconName } from "@/sprites/icons";
 
-const LINKS = [
-  { href: "/professor", label: "Visão geral", icon: "🏠" },
-  { href: "/professor/alunos", label: "Alunos", icon: "👩‍🎓" },
-  { href: "/professor/moedas", label: "Moedas", icon: "💰" },
-  { href: "/professor/loja", label: "Loja e catálogo", icon: "🛒" },
-  { href: "/professor/batalhas", label: "Battle Royales", icon: "⚔️" },
-  { href: "/professor/duelos", label: "Duelos", icon: "🥊" },
-  { href: "/professor/temporadas", label: "Temporadas", icon: "🏆" },
+const LINKS: { href: string; label: string; icon: IconName }[] = [
+  { href: "/professor", label: "Visão geral", icon: "house" },
+  { href: "/professor/alunos", label: "Alunos", icon: "student" },
+  { href: "/professor/moedas", label: "Moedas", icon: "coinBag" },
+  { href: "/professor/loja", label: "Loja e catálogo", icon: "cart" },
+  { href: "/professor/batalhas", label: "Battle Royales", icon: "swords" },
+  { href: "/professor/duelos", label: "Duelos", icon: "boxingGlove" },
+  { href: "/professor/temporadas", label: "Temporadas", icon: "trophy" },
 ];
 
 export function TeacherNav() {
@@ -26,7 +28,7 @@ export function TeacherNav() {
             active(l.href) ? "bg-white border-ink shadow-[2px_2px_0_#231a2e]" : "border-transparent hover:bg-white"
           }`}
         >
-          <span className="mr-1.5">{l.icon}</span>
+          <Icon name={l.icon} className="mr-1.5" />
           {l.label}
         </Link>
       ))}

@@ -4,6 +4,7 @@ import { ResultsTable } from "@/components/arena/ResultsTable";
 import { formatDateTime } from "@/lib/format";
 import { requireUser } from "@/server/auth";
 import { getBattle, getParticipants } from "@/server/battle-queries";
+import { Icon, PixelText } from "@/components/pixel/Icon";
 
 export default async function BattleResultPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -15,10 +16,10 @@ export default async function BattleResultPage({ params }: { params: Promise<{ i
   return (
     <div className="grid gap-4">
       <div className="flex flex-wrap items-end gap-2">
-        <h1 className="font-pixel text-3xl">📊 {battle.name}</h1>
+        <h1 className="font-pixel text-3xl"><Icon name="chart" /> {battle.name}</h1>
         <span className="text-sm text-muted">{formatDateTime(battle.finished_at)}</span>
         <Link href={`/arena/${battle.id}`} className="pixel-btn btn-small ml-auto">
-          ▶ Ver replay
+          <Icon name="play" /> Ver replay
         </Link>
       </div>
       {battle.summary && (
@@ -26,7 +27,7 @@ export default async function BattleResultPage({ params }: { params: Promise<{ i
           {battle.summary.funStats.map((s) => (
             <div key={s.title} className="pixel-panel p-3">
               <p className="font-pixel">
-                {s.emoji} {s.title}
+                <PixelText text={s.emoji} /> {s.title}
               </p>
               <p className="text-sm">{s.text}</p>
             </div>

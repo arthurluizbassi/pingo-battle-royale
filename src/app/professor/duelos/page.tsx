@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireTeacher } from "@/server/auth";
 import { schoolDay } from "@/server/duels";
 import { getClassProgress, getClassmates } from "@/server/queries";
+import { Icon } from "@/components/pixel/Icon";
 
 /** Supabase returns at most 1000 rows per request, so the week is read page by page. */
 const PAGE = 1000;
@@ -83,7 +84,7 @@ export default async function TeacherDuelsPage() {
 
   return (
     <div className="grid gap-4">
-      <h1 className="font-pixel text-3xl">🥊 Duelos</h1>
+      <h1 className="font-pixel text-3xl"><Icon name="boxingGlove" /> Duelos</h1>
       <p className="text-sm text-muted -mt-2">
         Duelos 1 contra 1 que os alunos fazem sozinhos com &quot;Encontrar Batalha&quot;. Cada um ganha XP em até{" "}
         {GAME.duels.dailyXpDuels} duelos por dia.
@@ -154,7 +155,7 @@ export default async function TeacherDuelsPage() {
                   <td className="p-2 text-right tabular-nums">{r.xp}</td>
                   <td className="p-2 text-right tabular-nums">
                     {r.today}
-                    {r.today >= GAME.duels.dailyXpDuels && <span title="Chegou ao limite de XP do dia"> ✅</span>}
+                    {r.today >= GAME.duels.dailyXpDuels && <span title="Chegou ao limite de XP do dia"> <Icon name="check" /></span>}
                   </td>
                   <td className="p-2 text-right tabular-nums">{r.week}</td>
                   <td className="p-2 text-right tabular-nums">{r.week ? `${Math.round((r.wins / r.week) * 100)}%` : "—"}</td>
@@ -181,7 +182,7 @@ export default async function TeacherDuelsPage() {
               return (
                 <li key={d.id} className="flex items-center gap-2 text-sm">
                   <span className="flex-1 min-w-0">
-                    <b>{challenger}</b> desafiou <b>{defender}</b> · 🏆 {winner}
+                    <b>{challenger}</b> desafiou <b>{defender}</b> · <Icon name="trophy" /> {winner}
                     {d.xp_gained > 0 ? (
                       <span className="text-leaf font-bold"> +{d.xp_gained} XP</span>
                     ) : (
@@ -190,7 +191,7 @@ export default async function TeacherDuelsPage() {
                     <span className="block text-xs text-muted">{formatDateTime(d.created_at)}</span>
                   </span>
                   <Link href={`/arena/duelo/${d.id}`} className="pixel-btn btn-small btn-white">
-                    ▶ Assistir
+                    <Icon name="play" /> Assistir
                   </Link>
                 </li>
               );

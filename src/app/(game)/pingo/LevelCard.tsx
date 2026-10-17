@@ -8,6 +8,7 @@ import { BALANCE, STAT_KEYS, type StatKey, type Stats } from "@/engine";
 import { STAT_LABEL, STAT_NAME } from "@/lib/format";
 import { availablePoints, levelProgress, type Progress } from "@/lib/levels";
 import { resetStatPoints, spendStatPoint } from "@/server/actions/duel";
+import { Icon } from "@/components/pixel/Icon";
 
 const UPGRADE_TEXT: Record<StatKey, string> = {
   hp: "+2 de vida",
@@ -36,14 +37,14 @@ export function LevelCard({ progress, stats }: { progress: Progress; stats: Stat
   return (
     <section id="nivel" className="pixel-panel p-4 scroll-mt-20">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="font-pixel text-lg">⭐ Nível {progress.level}</h2>
+        <h2 className="font-pixel text-lg"><Icon name="star" /> Nível {progress.level}</h2>
         {points > 0 && <span className="pixel-chip bg-grape text-white pop-in">{points} {points === 1 ? "ponto" : "pontos"} para usar!</span>}
       </div>
       <div className="h-4 pixel-inset !bg-[#4d4658] overflow-hidden mt-2">
         <div className="h-full bg-mint" style={{ width: bar.max ? "100%" : `${(bar.inLevel / bar.needed) * 100}%` }} />
       </div>
       <p className="text-xs text-muted mt-1">
-        {bar.max ? "Nível máximo! 🏅" : `${bar.inLevel}/${bar.needed} XP para o nível ${bar.level + 1} · vença duelos para ganhar XP`}
+        {bar.max ? <>Nível máximo! <Icon name="medal" /></> : `${bar.inLevel}/${bar.needed} XP para o nível ${bar.level + 1} · vença duelos para ganhar XP`}
       </p>
 
       <ul className="grid gap-1.5 mt-3">
@@ -74,7 +75,7 @@ export function LevelCard({ progress, stats }: { progress: Progress; stats: Stat
 
       <div className="flex flex-wrap items-center gap-2 mt-3">
         <Link href="/arena/duelo?buscar" className="pixel-btn btn-small btn-pink">
-          ⚔️ Duelar
+          <Icon name="swords" /> Duelar
         </Link>
         {progress.pointsSpent > 0 && (
           <button
@@ -82,7 +83,7 @@ export function LevelCard({ progress, stats }: { progress: Progress; stats: Stat
             disabled={pending}
             onClick={() => confirm("Devolver todos os pontos para distribuir de novo?") && run(() => resetStatPoints())}
           >
-            ↺ Redistribuir pontos
+            <Icon name="repeat" /> Redistribuir pontos
           </button>
         )}
       </div>

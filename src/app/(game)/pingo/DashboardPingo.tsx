@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { PingoAvatar } from "@/components/pingo/PingoAvatar";
 import type { PingoLook } from "@/sprites/compose";
 import type { GearSprites } from "@/sprites/items";
+import { PixelText } from "@/components/pixel/Icon";
 
 /** Big Pingo; celebrates when the inventory grew since the last visit. */
 export function DashboardPingo({ look, gear, inventoryCount }: { look: PingoLook; gear: GearSprites; inventoryCount: number }) {
@@ -27,7 +28,7 @@ export function DashboardPingo({ look, gear, inventoryCount }: { look: PingoLook
   return (
     <div className="relative flex flex-col items-center" onClick={() => setCelebrate((c) => c + 1)}>
       {bubble && (
-        <div className="pop-in absolute top-0 right-2 sm:right-8 pixel-panel px-3 py-1 font-pixel text-sm z-10">{bubble}</div>
+        <div className="pop-in absolute top-0 right-2 sm:right-8 pixel-panel px-3 py-1 font-pixel text-sm z-10"><PixelText text={bubble} /></div>
       )}
       <div className="hidden sm:block">
         <PingoAvatar look={look} gear={gear} size={300} celebrateKey={celebrate} />

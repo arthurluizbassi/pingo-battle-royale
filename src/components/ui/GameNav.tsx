@@ -1,21 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { Icon } from "@/components/pixel/Icon";
+import type { IconName } from "@/sprites/icons";
 import { usePathname } from "next/navigation";
 import type { Role } from "@/lib/db-types";
 
-const STUDENT_LINKS = [
-  { href: "/pingo", label: "Meu Pingo", icon: "🙂" },
-  { href: "/loja", label: "Loja", icon: "🛒" },
-  { href: "/inventario", label: "Inventário", icon: "🎒" },
-  { href: "/arena", label: "Arena", icon: "⚔️" },
-  { href: "/ranking", label: "Ranking", icon: "🏆" },
-  { href: "/historico", label: "Histórico", icon: "📜" },
+const STUDENT_LINKS: { href: string; label: string; icon: IconName }[] = [
+  { href: "/pingo", label: "Meu Pingo", icon: "pingoFace" },
+  { href: "/loja", label: "Loja", icon: "cart" },
+  { href: "/inventario", label: "Inventário", icon: "backpack" },
+  { href: "/arena", label: "Arena", icon: "swords" },
+  { href: "/ranking", label: "Ranking", icon: "trophy" },
+  { href: "/historico", label: "Histórico", icon: "scroll" },
 ];
 
-const TEACHER_LINKS = [
-  { href: "/arena", label: "Arena", icon: "⚔️" },
-  { href: "/ranking", label: "Ranking", icon: "🏆" },
+const TEACHER_LINKS: { href: string; label: string; icon: IconName }[] = [
+  { href: "/arena", label: "Arena", icon: "swords" },
+  { href: "/ranking", label: "Ranking", icon: "trophy" },
 ];
 
 /** Top tabs on desktop, bottom tab bar on phones. */
@@ -52,7 +54,7 @@ export function GameNav({ role }: { role: Role }) {
               active(l.href) ? "bg-white" : ""
             }`}
           >
-            <span className="text-lg leading-none">{l.icon}</span>
+            <Icon name={l.icon} size={20} />
             {l.label}
           </Link>
         ))}

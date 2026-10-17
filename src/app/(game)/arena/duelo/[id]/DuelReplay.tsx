@@ -5,6 +5,7 @@ import { DuelStage } from "@/components/duel/DuelExperience";
 import type { BattleEvent } from "@/engine";
 import type { DuelFighter } from "@/game/duel/DuelScene";
 import { unlock } from "@/game/duel/sfx";
+import { Icon } from "@/components/pixel/Icon";
 
 export function DuelReplay({ you, foe, events, winnerName }: { you: DuelFighter; foe: DuelFighter; events: BattleEvent[]; winnerName: string }) {
   // a fresh copy of the events restarts the Phaser stage
@@ -22,7 +23,7 @@ export function DuelReplay({ you, foe, events, winnerName }: { you: DuelFighter;
             setRun([...events]);
           }}
         >
-          ▶ Assistir duelo
+          <Icon name="play" /> Assistir duelo
         </button>
       </div>
     );
@@ -33,7 +34,7 @@ export function DuelReplay({ you, foe, events, winnerName }: { you: DuelFighter;
       <DuelStage you={you} foe={foe} events={run} onFinished={() => setDone(true)} />
       {done && (
         <div className="flex flex-wrap justify-center items-center gap-3 text-white">
-          <span className="font-pixel text-xl">🏆 {winnerName} venceu!</span>
+          <span className="font-pixel text-xl"><Icon name="trophy" /> {winnerName} venceu!</span>
           <button
             className="pixel-btn btn-small"
             onClick={() => {
@@ -41,7 +42,7 @@ export function DuelReplay({ you, foe, events, winnerName }: { you: DuelFighter;
               setRun([...events]);
             }}
           >
-            ↺ Assistir de novo
+            <Icon name="repeat" /> Assistir de novo
           </button>
         </div>
       )}

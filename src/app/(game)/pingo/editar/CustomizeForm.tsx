@@ -9,6 +9,7 @@ import { composePingo, type PingoLook } from "@/sprites/compose";
 import { DETAIL_STYLES, EYE_STYLES, MOUTH_STYLES } from "@/sprites/data/face";
 import type { GearSprites } from "@/sprites/items";
 import { BODY_COLORS, type BodyColor } from "@/sprites/palette";
+import { Icon } from "@/components/pixel/Icon";
 
 function Option({ selected, onClick, children, label }: { selected: boolean; onClick: () => void; children: React.ReactNode; label: string }) {
   return (
@@ -66,7 +67,7 @@ export function CustomizeForm({ initialName, initialLook, gear }: { initialName:
         />
         <p className="text-xs text-muted mt-2 text-center">A aparência é só estilo: não muda nenhum atributo.</p>
         <button className="pixel-btn btn-mint mt-3 w-full" onClick={save} disabled={pending || !name.trim()}>
-          {pending ? "Salvando..." : "💾 Salvar meu Pingo"}
+          {pending ? "Salvando..." : <><Icon name="floppy" /> Salvar meu Pingo</>}
         </button>
         {message && (
           <p className={`mt-2 text-sm font-bold ${message.ok ? "text-leaf" : "text-tomato"}`} role="status">

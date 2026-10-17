@@ -19,6 +19,7 @@ import { useScrollIntoViewOnMobile } from "@/components/ui/useScrollIntoViewOnMo
 import { equipItem } from "@/server/actions/student";
 import { statsWithLevel, type StatPoints } from "@/lib/levels";
 import type { PingoLook } from "@/sprites/compose";
+import { Icon } from "@/components/pixel/Icon";
 
 const SLOTS: ItemCategory[] = ["weapon", "helmet", "outfit"];
 const PLURAL: Record<ItemCategory, string> = { weapon: "Armas", helmet: "Capacetes", outfit: "Roupas" };
@@ -55,7 +56,7 @@ export function InventoryView({
         <PingoAvatar look={look} size={160} />
         <p>Seu inventário está vazio. Faça as atividades, ganhe moedas e visite a loja!</p>
         <Link href="/loja" className="pixel-btn">
-          Ir à loja 🛒
+          Ir à loja <Icon name="cart" />
         </Link>
       </div>
     );

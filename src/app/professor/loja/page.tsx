@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireTeacher } from "@/server/auth";
 import { getCurrentRotation } from "@/server/shop";
 import { ShopAdmin } from "./ShopAdmin";
+import { Icon } from "@/components/pixel/Icon";
 
 export default async function ShopAdminPage() {
   const session = await requireTeacher();
@@ -24,7 +25,7 @@ export default async function ShopAdminPage() {
 
   return (
     <div className="grid gap-4">
-      <h1 className="font-pixel text-3xl">🛒 Loja e catálogo</h1>
+      <h1 className="font-pixel text-3xl"><Icon name="cart" /> Loja e catálogo</h1>
       <Card title="Rotação atual">
         <p className="text-sm text-muted mb-2">
           {rotation

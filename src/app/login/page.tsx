@@ -33,6 +33,13 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
+        <p className="text-center text-[11px] text-muted mt-3">
+          Alguns ícones são baseados no{" "}
+          <a href="https://github.com/microsoft/fluentui-emoji" className="underline" target="_blank" rel="noreferrer">
+            Fluent Emoji
+          </a>{" "}
+          © Microsoft (licença MIT).
+        </p>
       </div>
     </main>
   );

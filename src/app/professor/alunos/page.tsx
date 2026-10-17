@@ -12,6 +12,7 @@ import { requireTeacher } from "@/server/auth";
 import { getClassmates } from "@/server/queries";
 import { CreateStudentForm } from "./CreateStudentForm";
 import { JoinCodePanel } from "./JoinCodePanel";
+import { Icon } from "@/components/pixel/Icon";
 
 export default async function StudentsPage() {
   const session = await requireTeacher();
@@ -30,7 +31,7 @@ export default async function StudentsPage() {
 
   return (
     <div className="grid gap-4">
-      <h1 className="font-pixel text-3xl">👩‍🎓 Alunos</h1>
+      <h1 className="font-pixel text-3xl"><Icon name="student" /> Alunos</h1>
       <Card title="Código da turma (os alunos se cadastram sozinhos)">
         <JoinCodePanel
           code={klass?.join_code ?? null}

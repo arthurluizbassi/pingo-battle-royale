@@ -11,6 +11,7 @@ import { isMuted, setMuted, sfx, unlock } from "@/game/duel/sfx";
 import type { DuelEntrant } from "@/lib/duel-roster";
 import { levelFromXp, levelProgress } from "@/lib/levels";
 import { findDuel } from "@/server/actions/duel";
+import { Icon } from "@/components/pixel/Icon";
 
 /** What the server (or the demo) says happened. */
 interface DuelReport {
@@ -155,7 +156,7 @@ export function DuelExperience({
         </p>
         <PingoAvatar look={me.fighter.look} gear={me.fighter.gear} size={180} />
         <button className="pixel-btn btn-pink text-3xl px-8 py-4" onClick={() => void findBattle()}>
-          ⚔️ Encontrar Batalha
+          <Icon name="swords" /> Encontrar Batalha
         </button>
         <p className="text-sm text-muted">
           Duelos com XP hoje: {Math.min(duelsToday, GAME.duels.dailyXpDuels)}/{GAME.duels.dailyXpDuels}
@@ -167,7 +168,7 @@ export function DuelExperience({
         <div className="fixed inset-0 z-50 bg-ink/95 flex flex-col items-center justify-center p-2 sm:p-6">
           <div className="absolute top-3 right-3 flex gap-2 z-10">
             <button className="pixel-btn btn-small btn-white" onClick={toggleMute} aria-label={muted ? "Ligar som" : "Desligar som"}>
-              {muted ? "🔇" : "🔊"}
+              <Icon name={muted ? "soundOff" : "soundOn"} />
             </button>
             {(phase.name === "waiting" || phase.name === "rolling" || phase.name === "found") && (
               <button className="pixel-btn btn-small btn-white" onClick={close}>
@@ -441,13 +442,13 @@ export function DuelStage({
             ctrl.current?.setSpeed(next);
           }}
         >
-          {speed === 1 ? "⏩ 2×" : "▶ 1×"}
+          {speed === 1 ? <><Icon name="fastForward" /> 2×</> : <><Icon name="play" /> 1×</>}
         </button>
         <button className="pixel-btn btn-small btn-white" onClick={() => onFinished(winnerId)}>
-          ⏭ Pular
+          <Icon name="skip" /> Pular
         </button>
         <button className="pixel-btn btn-small btn-white" onClick={() => void toggleFull()}>
-          {expanded ? "✕ Sair da tela cheia" : "⛶ Tela cheia"}
+          {expanded ? <><Icon name="close" /> Sair da tela cheia</> : <><Icon name="fullscreen" /> Tela cheia</>}
         </button>
       </div>
       {!expanded && <p className="sm:hidden text-center text-xs text-white/70">Dica: toque em Tela cheia e deite o celular.</p>}
@@ -525,7 +526,7 @@ function DuelResult({
       </div>
       {leveledUp && (
         <div className="pop-in grid gap-1">
-          <p className="font-pixel text-3xl text-grape">⬆ NÍVEL {report.levelAfter}!</p>
+          <p className="font-pixel text-3xl text-grape"><Icon name="levelUp" /> NÍVEL {report.levelAfter}!</p>
           <Link href="/pingo#nivel" className="pixel-btn btn-grape btn-small">
             Distribuir meu novo ponto
           </Link>
@@ -541,7 +542,7 @@ function DuelResult({
       </p>
       <div className="flex gap-2 mt-1">
         <button className="pixel-btn btn-pink text-lg" onClick={onAgain}>
-          ⚔️ Batalhar de novo
+          <Icon name="swords" /> Batalhar de novo
         </button>
         <button className="pixel-btn btn-white" onClick={onClose}>
           Fechar

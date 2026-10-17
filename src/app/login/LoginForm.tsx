@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { login, type LoginState } from "@/server/actions/auth";
+import { Icon } from "@/components/pixel/Icon";
 
 export function LoginForm() {
   const [state, action, pending] = useActionState<LoginState, FormData>(login, {});
@@ -33,7 +34,7 @@ export function LoginForm() {
         </p>
       )}
       <button className="pixel-btn mt-2 text-lg" disabled={pending}>
-        {pending ? "Entrando..." : "Entrar na arena ▶"}
+        {pending ? "Entrando..." : <>Entrar na arena <Icon name="play" /></>}
       </button>
     </form>
   );

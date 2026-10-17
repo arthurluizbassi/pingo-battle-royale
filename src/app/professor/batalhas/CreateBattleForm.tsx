@@ -45,7 +45,7 @@ export function CreateBattleForm({ defaultName }: { defaultName: string }) {
         </label>
         <label className="grid gap-1 text-sm">
           Prêmio da semana (opcional, só informativo)
-          <input className={inputClass} value={prize} onChange={(e) => setPrize(e.target.value)} placeholder="Caixa de chocolate 🍫" maxLength={200} />
+          <input className={inputClass} value={prize} onChange={(e) => setPrize(e.target.value)} placeholder="Caixa de chocolate" maxLength={200} />
         </label>
       </div>
       <label className="flex items-center gap-2 text-sm">

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PixelGrid } from "@/components/pixel/PixelGrid";
 import { composePingo, type PingoLook } from "@/sprites/compose";
 import { gearFromSprites, type GearSprites } from "@/sprites/items";
+import { Icon } from "@/components/pixel/Icon";
 
 /**
  * The Pingo, alive: blinks, looks around, bobs, hops now and then,
@@ -93,7 +94,7 @@ export function PingoAvatar({
                 animationDelay: `${i * 60}ms`,
               }}
             >
-              ✦
+              <Icon name="sparkle" />
             </span>
           ))}
         </div>

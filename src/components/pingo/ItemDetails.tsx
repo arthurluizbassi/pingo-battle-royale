@@ -14,6 +14,7 @@ import { STAT_KEYS } from "@/engine";
 import { EFFECT_NAME, effectDescription, formatModifier } from "@/lib/format";
 import { statsWithLevel, type StatPoints } from "@/lib/levels";
 import type { PingoLook } from "@/sprites/compose";
+import { Icon, Stars } from "@/components/pixel/Icon";
 
 export function ModifierList({ item }: { item: ItemDefinition }) {
   const mods = STAT_KEYS.filter((k) => item.statModifiers[k]);
@@ -27,7 +28,7 @@ export function ModifierList({ item }: { item: ItemDefinition }) {
           </li>
         );
       })}
-      {item.specialEffect && <li className="pixel-chip bg-[#ece4ff] text-[#4b2fa8]">★ {EFFECT_NAME[item.specialEffect.type]}</li>}
+      {item.specialEffect && <li className="pixel-chip bg-[#ece4ff] text-[#4b2fa8]"><Icon name="star" /> {EFFECT_NAME[item.specialEffect.type]}</li>}
     </ul>
   );
 }
@@ -59,7 +60,7 @@ export function ItemDetails({
         <PingoAvatar look={look} gear={tried} size={150} celebrateKey={item.id} />
         <div className="min-w-0">
           <p className="font-pixel text-xs text-muted">
-            {CATEGORY_LABEL[item.category]} · {"★".repeat(item.tier)}
+            {CATEGORY_LABEL[item.category]} · <Stars n={item.tier} />
           </p>
           <h3 className="font-pixel text-xl leading-tight">{item.name}</h3>
           <p className="text-sm italic text-muted mt-1">“{item.description}”</p>
@@ -71,7 +72,7 @@ export function ItemDetails({
       <ModifierList item={item} />
       {item.specialEffect && (
         <p className="pixel-inset bg-[#f4efff] px-2 py-1 text-sm">
-          <b>★ {EFFECT_NAME[item.specialEffect.type]}:</b> {effectDescription(item.specialEffect)}
+          <b><Icon name="star" /> {EFFECT_NAME[item.specialEffect.type]}:</b> {effectDescription(item.specialEffect)}
         </p>
       )}
       <p className="text-xs text-muted">Estilo: {item.tags.map((t) => TAG_LABEL[t]).join(" · ")}</p>

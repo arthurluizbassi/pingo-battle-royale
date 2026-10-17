@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireTeacher } from "@/server/auth";
 import { getStudentState } from "@/server/queries";
 import { StudentActions } from "./StudentActions";
+import { Icon } from "@/components/pixel/Icon";
 
 export default async function StudentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -71,7 +72,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
             })}
           </div>
           <p className="text-sm mb-2">
-            ⭐ <b>Nível {state.progress.level}</b> · {state.progress.xp} XP · pontos usados: {state.progress.pointsSpent}
+            <Icon name="star" /> <b>Nível {state.progress.level}</b> · {state.progress.xp} XP · pontos usados: {state.progress.pointsSpent}
           </p>
           <StatTable stats={build.stats} compact />
           <p className="text-xs text-muted mt-2">Power score estimado: {powerScore(build.stats, build.effects)} (Pingo pelado = 100)</p>

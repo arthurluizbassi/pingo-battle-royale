@@ -2,6 +2,7 @@ import { lookFromPingo } from "@/lib/snapshot";
 import { requireStudent } from "@/server/auth";
 import { getStudentState } from "@/server/queries";
 import { InventoryView } from "./InventoryView";
+import { Icon } from "@/components/pixel/Icon";
 
 export default async function InventoryPage() {
   const session = await requireStudent();
@@ -9,7 +10,7 @@ export default async function InventoryPage() {
   return (
     <div className="grid gap-4">
       <div>
-        <h1 className="font-pixel text-3xl">🎒 Inventário</h1>
+        <h1 className="font-pixel text-3xl"><Icon name="backpack" /> Inventário</h1>
         <p className="text-sm text-muted">
           Você pode ter quantos itens quiser, mas só entra na arena com 1 arma, 1 capacete e 1 roupa.
         </p>

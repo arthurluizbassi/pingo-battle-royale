@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import { suggestUsername } from "@/lib/join-code";
 import { joinClass, type JoinState } from "@/server/actions/join";
+import { Icon } from "@/components/pixel/Icon";
 
 const input = "pixel-inset px-3 py-2 bg-white text-lg w-full";
 
@@ -16,7 +17,7 @@ export function JoinForm({ initialCode }: { initialCode: string }) {
   if (state.done) {
     return (
       <div className="grid gap-3 text-center pop-in">
-        <p className="font-pixel text-2xl text-leaf">Pronto! 🎉</p>
+        <p className="font-pixel text-2xl text-leaf">Pronto! <Icon name="party" /></p>
         <p>
           Seu pedido para entrar na turma <b>{state.done.className}</b> foi enviado.
         </p>

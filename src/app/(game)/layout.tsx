@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/server/actions/auth";
 import type { ProgressRow } from "@/lib/db-types";
 import { NEW_PROGRESS, availablePoints, progressFromRow } from "@/lib/levels";
+import { Icon } from "@/components/pixel/Icon";
 
 /** Game shell: used by students (and by the teacher when opening the Arena/Ranking on the projector). */
 export default async function GameLayout({ children }: { children: React.ReactNode }) {
@@ -36,7 +37,7 @@ export default async function GameLayout({ children }: { children: React.ReactNo
             {!isTeacher && (
               // client-side navigation keeps the click's "user gesture", so the duel can play sound
               <Link href="/arena/duelo?buscar" className="pixel-btn btn-small btn-pink whitespace-nowrap">
-                ⚔️ <span className="hidden sm:inline">Encontrar Batalha</span>
+                <Icon name="swords" /> <span className="hidden sm:inline">Encontrar Batalha</span>
                 <span className="sm:hidden">Batalhar</span>
               </Link>
             )}
@@ -46,7 +47,7 @@ export default async function GameLayout({ children }: { children: React.ReactNo
                 className={`pixel-chip whitespace-nowrap ${freePoints > 0 ? "bg-grape text-white" : "bg-white"}`}
                 title={freePoints > 0 ? "Você tem pontos para distribuir!" : "Seu nível"}
               >
-                ⭐ Nv {progress.level}
+                <Icon name="star" /> Nv {progress.level}
                 {freePoints > 0 && <b>+{freePoints}</b>}
               </Link>
             )}

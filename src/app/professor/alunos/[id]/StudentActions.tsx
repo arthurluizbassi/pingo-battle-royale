@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { Card, Feedback, inputClass } from "@/components/ui/Card";
 import { GAME } from "@/config/game";
 import { grantCoins, resetStudentPassword, setStudentActive } from "@/server/actions/teacher";
+import { Icon } from "@/components/pixel/Icon";
 
 export function StudentActions({ profileId, active }: { profileId: string; active: boolean }) {
   const [amount, setAmount] = useState(String(GAME.rewards.defaultActivity));
@@ -54,7 +55,7 @@ export function StudentActions({ profileId, active }: { profileId: string; activ
       <p className="text-xs text-muted mt-1">Use valor negativo com “Ajuste administrativo” para retirar moedas. O saldo nunca fica negativo.</p>
       <div className="flex flex-wrap gap-2 mt-3">
         <button className="pixel-btn btn-small btn-white" disabled={pending} onClick={() => run(() => resetStudentPassword(profileId))}>
-          🔑 Gerar senha temporária
+          <Icon name="key" /> Gerar senha temporária
         </button>
         <button
           className={`pixel-btn btn-small ${active ? "btn-red" : "btn-mint"}`}

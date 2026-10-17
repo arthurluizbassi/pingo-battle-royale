@@ -8,6 +8,7 @@ import type { BattleEvent, FighterStats } from "@/engine";
 import type { ArenaController, ArenaParticipant } from "@/game/ArenaScene";
 import type { FeedEntry } from "@/game/timeline";
 import type { FunStat } from "@/lib/db-types";
+import { Icon, PixelText } from "@/components/pixel/Icon";
 
 export interface ReplayParticipant extends ArenaParticipant {
   displayName: string;
@@ -116,7 +117,7 @@ export function ArenaReplay({
           {showWinner && winner && (
             <div className="absolute inset-0 flex items-center justify-center bg-ink/55 p-3 pop-in">
               <div className="pixel-panel p-4 max-w-md w-full text-center grid gap-2 justify-items-center">
-                <p className="font-pixel text-bubble text-sm">🏆 CAMPEÃO DO {title.toUpperCase()}</p>
+                <p className="font-pixel text-bubble text-sm"><Icon name="trophy" /> CAMPEÃO DO {title.toUpperCase()}</p>
                 <PingoAvatar look={winner.look} gear={winner.gear} size={120} celebrateKey={winner.id} />
                 <p className="font-pixel text-2xl leading-none">{winner.pingoName}</p>
                 <p className="text-sm">de <b>{winner.displayName}</b></p>
@@ -124,14 +125,14 @@ export function ArenaReplay({
                   {winner.items.map((it) => (
                     <ItemIcon key={it.id} category={it.category} sprite={it.sprite} size={36} name={it.name} />
                   ))}
-                  {winner.items.length === 0 && <span className="text-sm text-muted">Venceu sem nenhum equipamento! 😱</span>}
+                  {winner.items.length === 0 && <span className="text-sm text-muted">Venceu sem nenhum equipamento! <Icon name="scared" /></span>}
                 </div>
-                <p className="font-pixel">💀 {results[winner.id]?.kills ?? 0} eliminações · 💥 {results[winner.id]?.damageDealt ?? 0} de dano</p>
+                <p className="font-pixel"><Icon name="skull" /> {results[winner.id]?.kills ?? 0} eliminações · <Icon name="explosion" /> {results[winner.id]?.damageDealt ?? 0} de dano</p>
                 {funStats.length > 0 && (
                   <ul className="text-left text-sm grid gap-1 w-full">
                     {funStats.slice(0, 4).map((s) => (
                       <li key={s.title}>
-                        {s.emoji} <b>{s.title}:</b> {s.text}
+                        <PixelText text={s.emoji} /> <b>{s.title}:</b> {s.text}
                       </li>
                     ))}
                   </ul>
@@ -148,7 +149,7 @@ export function ArenaReplay({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button className="pixel-btn btn-small" onClick={togglePlay}>
-            {playing ? "⏸ Pausar" : "▶ Play"}
+            {playing ? <><Icon name="pause" /> Pausar</> : <><Icon name="play" /> Play</>}
           </button>
           {[1, 2, 4].map((s) => (
             <button key={s} className={`pixel-btn btn-small ${speed === s ? "btn-grape" : "btn-white"}`} onClick={() => changeSpeed(s)}>
@@ -156,23 +157,23 @@ export function ArenaReplay({
             </button>
           ))}
           <button className="pixel-btn btn-small btn-white" onClick={restart}>
-            ↺ Reiniciar
+            <Icon name="repeat" /> Reiniciar
           </button>
           <button className="pixel-btn btn-small btn-white" onClick={() => controller.current?.skipToEnd()}>
-            ⏭ Pular para o fim
+            <Icon name="skip" /> Pular para o fim
           </button>
           <button className="pixel-btn btn-small btn-white ml-auto" onClick={fullscreen}>
-            ⛶ Tela cheia
+            <Icon name="fullscreen" /> Tela cheia
           </button>
         </div>
       </div>
 
       <aside className="pixel-panel p-3 flex flex-col min-h-0 max-h-[70vh] lg:max-h-none">
-        <h2 className="font-pixel text-lg mb-2">📣 Narração</h2>
+        <h2 className="font-pixel text-lg mb-2"><Icon name="megaphone" /> Narração</h2>
         <ol ref={feedRef} className="text-sm grid gap-1.5 overflow-y-auto pr-1 content-start" style={{ maxHeight: 460 }} aria-live="polite">
           {feed.map((entry, i) => (
             <li key={i} className={`pop-in ${TONE_CLASS[entry.tone]}`}>
-              {entry.text}
+              <PixelText text={entry.text} />
             </li>
           ))}
         </ol>
