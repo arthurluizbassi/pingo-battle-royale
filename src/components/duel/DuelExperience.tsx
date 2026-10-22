@@ -254,7 +254,11 @@ function Matchmaking({
     return items;
   }, [pool, foe]);
   const CELL = 112;
-  const [offset, setOffset] = useState(0);
+  const ROLL_MS = 2200;
+  /** the foe is the 3rd from the end of the strip */
+  const foeIndex = strip.length - 3;
+  const stripRef = useRef<HTMLDivElement>(null);
+  const [rolled, setRolled] = useState(false);
   // callbacks change every render; keep the animation effect from restarting
   const cb = useRef({ onFound, onDone });
   cb.current = { onFound, onDone };
@@ -266,27 +270,33 @@ function Matchmaking({
       const t = setTimeout(() => cb.current.onDone(), 900);
       return () => clearTimeout(t);
     }
-    const target = (strip.length - 3) * CELL;
-    const duration = 2200;
-    const start = performance.now();
-    let raf = 0;
+    // The browser animates the strip (CSS transition) and always lands on the final position,
+    // even if the tab goes to the background; timers only add the "tick" sounds and the stop.
+    const kick = setTimeout(() => setRolled(true), 30);
     let lastCell = -1;
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - p, 3.2);
-      const x = target * eased;
-      setOffset(x);
-      const cell = Math.floor(x / CELL);
+    const ticks = setInterval(() => {
+      const el = stripRef.current;
+      if (!el) return;
+      const x = new DOMMatrixReadOnly(getComputedStyle(el).transform).m41;
+      const cell = Math.round((-x - CELL / 2) / CELL);
       if (cell !== lastCell) {
         lastCell = cell;
         sfx("search");
       }
-      if (p < 1) raf = requestAnimationFrame(tick);
-      else cb.current.onFound();
+    }, 50);
+    const stop = setTimeout(() => {
+      clearInterval(ticks);
+      cb.current.onFound();
+    }, ROLL_MS + 120);
+    return () => {
+      clearTimeout(kick);
+      clearInterval(ticks);
+      clearTimeout(stop);
     };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
   }, [found, strip.length]);
+
+  // centre of cell i sits on the centre of the box (left: 50%) when shifted by -(i * CELL + CELL / 2)
+  const shift = -((rolled || found ? foeIndex : 0) * CELL + CELL / 2);
 
   return (
     <div className="w-full max-w-3xl flex flex-col items-center gap-6 text-white">
@@ -315,11 +325,18 @@ function Matchmaking({
           <>
             <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[116px] border-4 border-sun rounded-md z-10 pointer-events-none" />
             <div
+              ref={stripRef}
               className="absolute top-2 flex"
-              style={{ transform: `translateX(calc(50% - ${offset + CELL / 2}px))`, left: 0, width: strip.length * CELL }}
+              data-foe-index={foeIndex}
+              style={{
+                left: "50%",
+                width: strip.length * CELL,
+                transform: `translateX(${shift}px)`,
+                transition: rolled ? `transform ${ROLL_MS}ms cubic-bezier(0.15, 0.85, 0.25, 1)` : "none",
+              }}
             >
               {strip.map((c, i) => (
-                <div key={i} className="flex flex-col items-center justify-center" style={{ width: CELL }}>
+                <div key={i} className="flex flex-col items-center justify-center" style={{ width: CELL }} data-pingo={c.fighter.id}>
                   <PingoAvatar look={c.fighter.look} gear={c.fighter.gear} size={84} animated={false} shadow={false} />
                   <span className="font-pixel text-sm text-white truncate max-w-[100px]">{c.fighter.pingoName}</span>
                   <span className="font-pixel text-xs text-sun">Nv {c.fighter.level ?? 1}</span>
