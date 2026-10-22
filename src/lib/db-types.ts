@@ -36,6 +36,23 @@ export interface ClassRow {
   shop_auto_rotate: boolean;
   join_code: string | null;
   join_enabled: boolean;
+  /** coins for the 1st, 2nd and 3rd of the daily duel ranking (0 = no prize) */
+  daily_prizes: number[];
+}
+
+export interface DailyRankingRow {
+  profile_id: string;
+  wins: number;
+  duels: number;
+  reached_at: string | null;
+  place: number;
+}
+
+export interface DailyPodium {
+  class_id: string;
+  day: string;
+  podium: Array<{ profile_id: string; place: number; wins: number; prize: number }>;
+  settled_at: string;
 }
 
 export type TxType = "activity" | "admin_adjustment" | "purchase" | "special_reward";

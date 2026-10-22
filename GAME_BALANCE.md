@@ -152,3 +152,11 @@ Resultados da simulação (turma virtual de 20–35 alunos, 8 semanas):
 Os pontos de nível também valem no Battle Royale (entram no snapshot no LOCK) e respeitam os
 mesmos limites de atributo. Redistribuir os pontos é grátis. O professor pode zerar os níveis da
 turma em Temporadas (o histórico de duelos fica).
+
+### Ranking diário de duelos
+
+- Conta as **vitórias nos duelos com XP** (no máximo 12 por dia) dos duelos que o aluno iniciou; amistosos não contam.
+  Empate: fica na frente quem chegou primeiro naquele número de vitórias.
+- Vira à meia-noite de Brasília. O pódio do dia é pago uma única vez (`settle_daily_ranking`), na primeira visita
+  depois da meia-noite, com os prêmios configurados naquele momento em **Professor → Moedas** (0 a 1000 cada; 0 = sem moedas).
+- Os prêmios entram no livro-caixa como "Prêmio especial — Ranking diário". As moedas principais continuam vindo das atividades.

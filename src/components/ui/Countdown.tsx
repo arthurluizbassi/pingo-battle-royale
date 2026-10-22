@@ -26,7 +26,7 @@ export function Countdown({ to }: { to: string }) {
   );
   return (
     <span className="inline-flex gap-1.5">
-      {cell(d, "dias")}
+      {d > 0 && cell(d, "dias")}
       {cell(h, "horas")}
       {cell(m, "min")}
       {cell(s, "seg")}

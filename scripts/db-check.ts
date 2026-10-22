@@ -202,6 +202,46 @@ async function main() {
         Number((await one<{ n: string }>("select count(*) n from pingo_progress where owner_id = $1", [rich.id])).n) === 1,
     );
 
+    // ---------- daily duel ranking: the server pays the top 3 of a finished day, exactly once
+    await as("postgres");
+    await client.query("delete from daily_rankings where class_id = $1", [rich.class_id]);
+    await client.query("update classes set daily_prizes = '{30,20,10}' where id = $1", [rich.class_id]);
+    const yesterdayAt = "(date_trunc('day', now() at time zone 'America/Sao_Paulo') - interval '12 hours') at time zone 'America/Sao_Paulo'";
+    for (const [challenger, defender, winner] of [
+      [rich.id, poor.id, rich.id],
+      [rich.id, poor.id, rich.id],
+      [poor.id, rich.id, poor.id],
+    ]) {
+      await client.query(
+        `insert into duels (class_id, challenger_id, defender_id, winner_id, seed, engine_version, balance, snapshots, events, xp_gained, counted, created_at)
+         values ($1, $2, $3, $4, 1, 'test', '{}', '[]', '[]', 30, true, ${yesterdayAt})`,
+        [rich.class_id, challenger, defender, winner],
+      );
+    }
+    const balanceOf = async (id: string) => Number((await one<{ b: number }>("select balance b from wallets where owner_id = $1", [id])).b);
+    const richBefore = await balanceOf(rich.id);
+    const poorBefore = await balanceOf(poor.id);
+    await one("select settle_pending_rankings($1)", [rich.class_id]);
+    check("ranking diário paga o 1º lugar", (await balanceOf(rich.id)) === richBefore + 30, `${richBefore} → ${await balanceOf(rich.id)}`);
+    check("ranking diário paga o 2º lugar", (await balanceOf(poor.id)) === poorBefore + 20);
+    await one("select settle_pending_rankings($1)", [rich.class_id]);
+    check("ranking diário não paga duas vezes o mesmo dia", (await balanceOf(rich.id)) === richBefore + 30);
+    await expectError(
+      "o dia de hoje só é pago depois da meia-noite",
+      "select settle_daily_ranking($1, (now() at time zone 'America/Sao_Paulo')::date)",
+      [rich.class_id],
+      "day_not_over",
+    );
+    await as("authenticated", rich.id);
+    await expectError("aluno não dispara o pagamento do ranking", "select settle_pending_rankings($1)", [rich.class_id], "permission denied");
+    await expectError("aluno não altera os prêmios do ranking", "update classes set daily_prizes = '{999,0,0}'", [], "permission denied");
+    const seenRanking = await client.query("select * from daily_ranking((now() at time zone 'America/Sao_Paulo')::date - 1)");
+    check(
+      "aluno vê o ranking diário da própria turma",
+      seenRanking.rows.length >= 2 && seenRanking.rows[0].profile_id === rich.id && seenRanking.rows[0].wins === 2,
+      JSON.stringify(seenRanking.rows.map((r) => [r.place, r.wins])),
+    );
+
     // ---------- self sign-up: pending students see nothing of the class
     await as("authenticated", rich.id);
     await expectError(

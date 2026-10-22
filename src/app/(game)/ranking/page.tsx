@@ -6,11 +6,14 @@ import { lookFromPingo } from "@/lib/snapshot";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/server/auth";
 import { getClassmates, getSeasonRanking } from "@/server/queries";
+import { DailyRanking } from "@/components/duel/DailyRanking";
+import { getDailyPrizes, getRecentPodiums, getTodayRanking, nextMidnightBrasilia, settlePendingRankings } from "@/server/daily-ranking";
 import { Icon } from "@/components/pixel/Icon";
 
 export default async function RankingPage({ searchParams }: { searchParams: Promise<{ temporada?: string }> }) {
   const session = await requireUser();
   const { temporada } = await searchParams;
+  await settlePendingRankings(session.profile.class_id);
   const supabase = await createClient();
   const { data: seasons } = await supabase
     .from("seasons")
@@ -19,16 +22,28 @@ export default async function RankingPage({ searchParams }: { searchParams: Prom
     .order("starts_at", { ascending: false })
     .returns<SeasonRow[]>();
   const season = (seasons ?? []).find((s) => s.id === temporada) ?? (seasons ?? []).find((s) => s.active) ?? seasons?.[0];
-  const [ranking, classmates] = await Promise.all([
+  const [ranking, classmates, todayRanking, prizes, podiums] = await Promise.all([
     season ? getSeasonRanking(season.id) : Promise.resolve([]),
     getClassmates(session.profile.class_id),
+    getTodayRanking(),
+    getDailyPrizes(session.profile.class_id),
+    getRecentPodiums(session.profile.class_id, 1),
   ]);
   const byId = new Map(classmates.map((c) => [c.profile.id, c]));
 
   return (
     <div className="grid gap-4">
+      <h1 className="font-pixel text-3xl"><Icon name="trophy" /> Ranking</h1>
+      <DailyRanking
+        rows={todayRanking}
+        people={byId}
+        meId={session.userId}
+        prizes={prizes}
+        resetsAt={nextMidnightBrasilia()}
+        yesterday={podiums[0] ?? null}
+      />
       <div className="flex flex-wrap items-end gap-3">
-        <h1 className="font-pixel text-3xl"><Icon name="trophy" /> Ranking</h1>
+        <h2 className="font-pixel text-2xl">Temporada do Battle Royale</h2>
         <div className="flex flex-wrap gap-1 ml-auto">
           {(seasons ?? []).map((s) => (
             <Link key={s.id} href={`/ranking?temporada=${s.id}`} className={`pixel-btn btn-small ${s.id === season?.id ? "" : "btn-white"}`}>

@@ -9,7 +9,9 @@ import { lookFromPingo } from "@/lib/snapshot";
 import { createClient } from "@/lib/supabase/server";
 import type { TrophyRow } from "@/lib/db-types";
 import { requireStudent } from "@/server/auth";
-import { getActiveSeason, getNextBattle, getSeasonRanking, getStudentState } from "@/server/queries";
+import { getActiveSeason, getClassmates, getNextBattle, getSeasonRanking, getStudentState } from "@/server/queries";
+import { DailyRanking } from "@/components/duel/DailyRanking";
+import { getDailyPrizes, getTodayRanking, nextMidnightBrasilia, settlePendingRankings } from "@/server/daily-ranking";
 import { statsWithLevel } from "@/lib/levels";
 import { DashboardPingo } from "./DashboardPingo";
 import { LevelCard } from "./LevelCard";
@@ -20,10 +22,14 @@ const SLOTS: ItemCategory[] = ["weapon", "helmet", "outfit"];
 export default async function MyPingoPage() {
   const session = await requireStudent();
   const classId = session.profile.class_id;
-  const [state, nextBattle, season] = await Promise.all([
+  await settlePendingRankings(classId);
+  const [state, nextBattle, season, classmates, todayRanking, prizes] = await Promise.all([
     getStudentState(session.userId),
     getNextBattle(classId),
     getActiveSeason(classId),
+    getClassmates(classId),
+    getTodayRanking(),
+    getDailyPrizes(classId),
   ]);
   const progress = state.progress;
   const ranking = season ? await getSeasonRanking(season.id) : [];
@@ -99,6 +105,14 @@ export default async function MyPingoPage() {
           <Icon name="swords" /> Encontrar Batalha
         </Link>
         <LevelCard progress={progress} stats={stats} />
+        <DailyRanking
+          compact
+          rows={todayRanking}
+          people={new Map(classmates.map((c) => [c.profile.id, c]))}
+          meId={session.userId}
+          prizes={prizes}
+          resetsAt={nextMidnightBrasilia()}
+        />
         <section className="pixel-panel p-4">
           <h2 className="font-pixel text-lg mb-2"><Icon name="swords" /> Próximo Battle Royale</h2>
           {nextBattle ? (

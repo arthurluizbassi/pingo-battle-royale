@@ -7,6 +7,8 @@ import { NEW_PROGRESS } from "@/lib/levels";
 import { requireUser } from "@/server/auth";
 import { schoolDay } from "@/server/duels";
 import { getClassProgress, getClassmates, getMyDuels } from "@/server/queries";
+import { DailyRanking } from "@/components/duel/DailyRanking";
+import { getDailyPrizes, getTodayRanking, nextMidnightBrasilia, settlePendingRankings } from "@/server/daily-ranking";
 import { Icon } from "@/components/pixel/Icon";
 
 /** Duels against classmates: the server picks the opponent and saves the XP. */
@@ -14,10 +16,13 @@ export default async function DuelPage({ searchParams }: { searchParams: Promise
   const session = await requireUser();
   if (session.profile.role !== "student") redirect("/arena");
   const { buscar } = await searchParams;
-  const [classmates, progress, duels] = await Promise.all([
+  await settlePendingRankings(session.profile.class_id);
+  const [classmates, progress, duels, todayRanking, prizes] = await Promise.all([
     getClassmates(session.profile.class_id),
     getClassProgress(),
     getMyDuels(session.userId, 40),
+    getTodayRanking(),
+    getDailyPrizes(session.profile.class_id),
   ]);
   const active = classmates.filter((c) => c.profile.active && !c.profile.pending);
   const roster = active.map((c) => entrantFrom(c.profile, c.pingo, c.loadout, progress.get(c.profile.id) ?? NEW_PROGRESS));
@@ -40,6 +45,15 @@ export default async function DuelPage({ searchParams }: { searchParams: Promise
           initial={{ xp: (progress.get(session.userId) ?? NEW_PROGRESS).xp, duelsToday }}
         />
       )}
+
+      <DailyRanking
+        compact
+        rows={todayRanking}
+        people={new Map(classmates.map((c) => [c.profile.id, c]))}
+        meId={session.userId}
+        prizes={prizes}
+        resetsAt={nextMidnightBrasilia()}
+      />
 
       <section className="pixel-panel p-4">
         <h2 className="font-pixel text-lg mb-2"><Icon name="scroll" /> Últimos duelos</h2>

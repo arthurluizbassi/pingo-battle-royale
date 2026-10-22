@@ -7,11 +7,13 @@ import { formatDateTime } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { requireTeacher } from "@/server/auth";
 import { getActiveSeason, getNextBattle } from "@/server/queries";
+import { settlePendingRankings } from "@/server/daily-ranking";
 import { Icon } from "@/components/pixel/Icon";
 
 export default async function TeacherHome() {
   const session = await requireTeacher();
   const classId = session.profile.class_id;
+  await settlePendingRankings(classId);
   const supabase = await createClient();
   const [{ data: students }, { data: wallets }, { data: txs }, nextBattle, season, { data: klass }] = await Promise.all([
     supabase.from("profiles").select("*").eq("class_id", classId).eq("role", "student").returns<ProfileRow[]>(),

@@ -304,6 +304,30 @@ export async function rejectStudent(profileId: string): Promise<ActionResult> {
   });
 }
 
+// ------------------------------------------------------------------ daily duel ranking
+const dailyPrizesSchema = z.object({
+  first: z.coerce.number().int().min(0, "O prêmio não pode ser negativo.").max(1000, "No máximo 1000 moedas."),
+  second: z.coerce.number().int().min(0, "O prêmio não pode ser negativo.").max(1000, "No máximo 1000 moedas."),
+  third: z.coerce.number().int().min(0, "O prêmio não pode ser negativo.").max(1000, "No máximo 1000 moedas."),
+});
+
+/** Coins paid at midnight to the top 3 of the daily duel ranking (0 = no prize). */
+export async function updateDailyPrizes(input: z.input<typeof dailyPrizesSchema>): Promise<ActionResult> {
+  return runAction(async () => {
+    const session = await assertTeacher();
+    const data = dailyPrizesSchema.parse(input);
+    const { error } = await createAdminClient()
+      .from("classes")
+      .update({ daily_prizes: [data.first, data.second, data.third] })
+      .eq("id", session.profile.class_id);
+    if (error) throw new Error(error.message);
+    revalidatePath("/", "layout");
+    return data.first + data.second + data.third === 0
+      ? "Prêmios zerados: o ranking diário continua, sem moedas."
+      : `Prêmios salvos: ${data.first} / ${data.second} / ${data.third} moedas.`;
+  });
+}
+
 // ------------------------------------------------------------------ seasons
 /** Everyone back to level 1 with 0 XP and no points (the duel history is kept). */
 export async function resetClassProgress(): Promise<ActionResult> {
