@@ -3,7 +3,6 @@ import { Icon } from "@/components/pixel/Icon";
 import { PingoAvatar } from "@/components/pingo/PingoAvatar";
 import { Coins } from "@/components/ui/Coins";
 import { Countdown } from "@/components/ui/Countdown";
-import { GAME } from "@/config/game";
 import type { DailyPodium, DailyRankingRow, PingoRow, ProfileRow } from "@/lib/db-types";
 import type { Loadout } from "@/content/items";
 import { lookFromPingo } from "@/lib/snapshot";
@@ -103,8 +102,8 @@ export function DailyRanking({
         </div>
       ) : (
         <p className="text-xs text-muted">
-          Contam as vitórias nos {GAME.duels.dailyXpDuels} duelos do dia que dão XP. Empate: fica na frente quem chegou primeiro
-          naquele número de vitórias.
+          Contam as vitórias de todos os duelos do dia, inclusive os amistosos (sem XP). Empate: fica na frente quem chegou
+          primeiro naquele número de vitórias.
         </p>
       )}
 

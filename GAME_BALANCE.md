@@ -155,7 +155,8 @@ turma em Temporadas (o histórico de duelos fica).
 
 ### Ranking diário de duelos
 
-- Conta as **vitórias nos duelos com XP** (no máximo 12 por dia) dos duelos que o aluno iniciou; amistosos não contam.
+- Conta as **vitórias de todos os duelos do dia** que o aluno iniciou, amistosos incluídos (sem limite desde 23/10/2026;
+  o XP continua limitado a 12 duelos). O intervalo mínimo de 8 s entre duelos continua valendo.
   Empate: fica na frente quem chegou primeiro naquele número de vitórias.
 - Vira à meia-noite de Brasília. O pódio do dia é pago uma única vez (`settle_daily_ranking`), na primeira visita
   depois da meia-noite, com os prêmios configurados naquele momento em **Professor → Moedas** (0 a 1000 cada; 0 = sem moedas).

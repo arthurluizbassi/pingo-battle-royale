@@ -51,7 +51,7 @@ export default async function CoinsPage() {
         <div className="grid gap-4">
           <p className="text-sm max-w-2xl">
             Todo dia, à meia-noite (horário de Brasília), os 3 alunos com mais vitórias nos duelos do dia ganham as moedas abaixo.
-            Contam só os 12 duelos diários que dão XP; empate fica com quem chegou primeiro naquele número de vitórias.
+            Contam todos os duelos do dia, inclusive os amistosos (sem limite): quem joga mais pode ganhar. Empate fica com quem chegou primeiro naquele número de vitórias.
           </p>
           <DailyPrizesForm prizes={prizes} />
           <DailyRanking rows={todayRanking} people={people} prizes={prizes} resetsAt={nextMidnightBrasilia()} />
