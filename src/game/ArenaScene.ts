@@ -85,8 +85,9 @@ export function mountArena(
   const n = data.participants.length;
   const pingoScale = n <= 6 ? 2.2 : n <= 12 ? 1.8 : n <= 20 ? 1.5 : 1.25;
   const font = data.fontFamily || "monospace";
-  // the game font (Jersey 10) is drawn small for its size; scale every label so it reads like the UI
-  const px = (size: number) => `${Math.round(size * 1.25)}px`;
+  // Jersey 10 is drawn on a 10px pixel grid: only multiples of 10 stay crisp (15px or 18px get
+  // smoothed and look like a plain rounded font). Scale up a bit, then snap to the grid.
+  const px = (size: number) => `${Math.max(20, Math.round((size * 1.25) / 10) * 10)}px`;
 
   const state = { playing: true, speed: 1, elapsed: 0, stepIndex: 0, feedIndex: 0, finished: false };
 

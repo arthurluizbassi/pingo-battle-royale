@@ -411,6 +411,12 @@ export function DuelStage({
     (async () => {
       const [{ default: Phaser }, { mountDuel }] = await Promise.all([import("phaser"), import("@/game/duel/DuelScene")]);
       if (cancelled || !hostRef.current) return;
+      // make sure the game font is really downloaded: a canvas text drawn before that uses the
+      // fallback font and keeps it for the whole battle
+      await Promise.race([
+        document.fonts?.load(`20px ${getComputedStyle(document.body).getPropertyValue("--font-game").trim()}`),
+        new Promise((r) => setTimeout(r, 3000)),
+      ]).catch(() => {});
       await document.fonts?.ready;
       const fontFamily = getComputedStyle(document.body).getPropertyValue("--font-game").trim();
       const params = new URLSearchParams(window.location.search);

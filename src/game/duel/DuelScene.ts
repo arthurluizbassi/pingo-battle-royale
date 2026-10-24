@@ -107,7 +107,9 @@ function drawPixels(scene: Phaser.Scene, key: string, rows: string[], colors: Re
 
 export function mountDuel(PhaserLib: typeof Phaser, parent: HTMLElement, data: DuelData, callbacks: DuelCallbacks): DuelController {
   const font = data.fontFamily || "monospace";
-  const px = (size: number) => `${Math.round(size * 1.25)}px`;
+  // Jersey 10 is drawn on a 10px pixel grid: only multiples of 10 stay crisp (15px or 18px get
+  // smoothed and look like a plain rounded font). Scale up a bit, then snap to the grid.
+  const px = (size: number) => `${Math.max(20, Math.round((size * 1.25) / 10) * 10)}px`;
   let speed = 1;
   let destroyed = false;
 
