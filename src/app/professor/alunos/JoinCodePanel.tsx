@@ -6,6 +6,7 @@ import { Feedback } from "@/components/ui/Card";
 import { displayJoinCode } from "@/lib/join-code";
 import { formatDateTime } from "@/lib/format";
 import { approveStudents, regenerateJoinCode, rejectStudent, setJoinEnabled } from "@/server/actions/teacher";
+import { JoinQr } from "./JoinQr";
 
 type Result = { ok: true; message?: string } | { ok: false; error: string };
 
@@ -61,22 +62,25 @@ export function JoinCodePanel({
             </div>
           )}
           <p className="text-xs text-muted">
-            Escreva o código no quadro ou mande o link. Cada cadastro fica aguardando a sua aprovação aqui embaixo.
+            Escreva o código no quadro, mande o link ou projete o QR Code. Cada cadastro fica aguardando a sua aprovação aqui embaixo.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <button className={`pixel-btn btn-small ${enabled ? "btn-white" : "btn-mint"}`} disabled={busy} onClick={() => run(() => setJoinEnabled(!enabled))}>
-            {enabled ? "Fechar cadastro" : "Abrir cadastro"}
-          </button>
-          {code && (
-            <button
-              className="pixel-btn btn-small btn-white"
-              disabled={busy}
-              onClick={() => confirm("Gerar um código novo? O código atual para de funcionar.") && run(regenerateJoinCode)}
-            >
-              Gerar novo código
+        <div className="flex flex-wrap items-center gap-3">
+          {enabled && code && <JoinQr link={link} code={code} />}
+          <div className="flex flex-col gap-2">
+            <button className={`pixel-btn btn-small ${enabled ? "btn-white" : "btn-mint"}`} disabled={busy} onClick={() => run(() => setJoinEnabled(!enabled))}>
+              {enabled ? "Fechar cadastro" : "Abrir cadastro"}
             </button>
-          )}
+            {code && (
+              <button
+                className="pixel-btn btn-small btn-white"
+                disabled={busy}
+                onClick={() => confirm("Gerar um código novo? O código atual para de funcionar.") && run(regenerateJoinCode)}
+              >
+                Gerar novo código
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
