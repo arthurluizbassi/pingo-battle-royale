@@ -15,7 +15,12 @@ export default async function TeacherLayout({ children }: { children: React.Reac
           <Link href="/professor" className="font-pixel text-lg whitespace-nowrap">
             Pingo <span className="text-sun">Royale</span> <span className="text-xs opacity-70">· Professor</span>
           </Link>
-          <Link href="/arena" className="ml-auto pixel-btn btn-small">
+          {session.profile.is_admin && (
+            <Link href="/admin" className="ml-auto pixel-btn btn-small btn-white">
+              <Icon name="crown" /> Admin
+            </Link>
+          )}
+          <Link href="/arena" className={`${session.profile.is_admin ? "" : "ml-auto "}pixel-btn btn-small`}>
             <Icon name="swords" /> Arena (projetor)
           </Link>
           <span className="hidden sm:inline text-sm opacity-80">{session.profile.display_name}</span>

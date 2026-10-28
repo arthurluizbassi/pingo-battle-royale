@@ -45,6 +45,13 @@ export async function requireTeacher(): Promise<Session> {
   return session;
 }
 
+/** General admin (profiles.is_admin): may read every class through the service-role client. */
+export async function requireAdmin(): Promise<Session> {
+  const session = await requireUser();
+  if (session.profile.is_admin !== true) redirect(session.profile.role === "teacher" ? "/professor" : "/pingo");
+  return session;
+}
+
 /**
  * For server actions: never redirect silently, throw instead.
  * This is the backend authorization — hiding buttons in the UI is not enough.

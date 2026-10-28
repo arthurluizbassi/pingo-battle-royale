@@ -15,6 +15,8 @@ export interface ProfileRow {
   /** signed up with the class code, waiting for the teacher's approval */
   pending: boolean;
   must_change_password: boolean;
+  /** general admin: sees every class at /admin (read-only). Missing before the migration. */
+  is_admin?: boolean;
   created_at: string;
 }
 

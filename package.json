@@ -22,7 +22,8 @@
     "db:local:start": "supabase start",
     "db:local:stop": "supabase stop",
     "seed": "tsx scripts/seed.ts",
-    "create-teacher": "tsx scripts/create-teacher.ts"
+    "create-teacher": "tsx scripts/create-teacher.ts",
+    "make-admin": "tsx scripts/make-admin.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
