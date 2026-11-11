@@ -155,9 +155,20 @@ turma em Temporadas (o histórico de duelos fica).
 
 ### Ranking diário de duelos
 
-- Conta as **vitórias de todos os duelos do dia** que o aluno iniciou, amistosos incluídos (sem limite desde 23/10/2026;
-  o XP continua limitado a 12 duelos). O intervalo mínimo de 8 s entre duelos continua valendo.
-  Empate: fica na frente quem chegou primeiro naquele número de vitórias.
+- Desde 11/11/2026 o ranking é por **troféus** (estilo Clash), não mais por soma de vitórias — somar vitórias
+  premiava só quem jogava mais. Números em `GAME.duels.trophies`; a conta real é feita no banco (`record_duel`),
+  com uma cópia em `src/lib/trophies.ts`.
+  - Todo mundo começa o dia com **1000** troféus. Só os troféus de quem **iniciou** o duelo mudam; o desafiado nunca
+    ganha nem perde.
+  - Cada duelo vale **60** troféus, divididos pela diferença de troféus: `E = 1 / (1 + 10^((oponente − eu) / 400))`;
+    vitória = `+60 × (1 − E)`, derrota = `−60 × E` (mínimo 1, piso 0). Com troféus iguais: +30 / −30; oponente 200
+    acima: +46 / −14; 200 abaixo: +14 / −46. Quem perde em sequência perde cada vez menos (−30, −27, −25…), e quem
+    ganha em sequência ganha cada vez menos.
+  - Contam todos os duelos do dia, amistosos incluídos (o XP continua limitado a 12 duelos; intervalo mínimo de 8 s).
+  - Pódio: só entra quem fez pelo menos **5 duelos** no dia. Empate em troféus: mais vitórias, depois quem chegou primeiro.
+  - Simulação (30 alunos, 1 dia): jogar mais não aumenta a média de troféus (correlação ~0; antes 0,92), mas dá mais
+    chances de uma boa sequência — o campeão joga 40+ duelos em ~64% dos dias (antes 100%).
+  - Dias anteriores ao sistema (sem `trophy_delta`) continuam classificados por vitórias.
 - Vira à meia-noite de Brasília. O pódio do dia é pago uma única vez (`settle_daily_ranking`), na primeira visita
   depois da meia-noite, com os prêmios configurados naquele momento em **Professor → Moedas** (0 a 1000 cada; 0 = sem moedas).
 - Os prêmios entram no livro-caixa como "Prêmio especial — Ranking diário". As moedas principais continuam vindo das atividades.

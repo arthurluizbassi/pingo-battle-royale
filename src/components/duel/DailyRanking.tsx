@@ -3,6 +3,7 @@ import { Icon } from "@/components/pixel/Icon";
 import { PingoAvatar } from "@/components/pingo/PingoAvatar";
 import { Coins } from "@/components/ui/Coins";
 import { Countdown } from "@/components/ui/Countdown";
+import { GAME } from "@/config/game";
 import type { DailyPodium, DailyRankingRow, PingoRow, ProfileRow } from "@/lib/db-types";
 import type { Loadout } from "@/content/items";
 import { lookFromPingo } from "@/lib/snapshot";
@@ -15,17 +16,18 @@ export interface RankingPerson {
 }
 
 const MEDAL: IconName[] = ["medalGold", "medalSilver", "medalBronze"];
+const MIN_DUELS = GAME.duels.trophies.minDuelsForPodium;
 
-function Place({ place }: { place: number }) {
+function Place({ place, qualified }: { place: number; qualified: boolean }) {
   return (
     <span className="w-9 shrink-0 text-center">
-      {place <= 3 ? <Icon name={MEDAL[place - 1]} size={28} title={`${place}º lugar`} /> : <span className="font-bold text-lg">{place}º</span>}
+      {!qualified ? <span className="font-bold text-lg text-muted">–</span> : place <= 3 ? <Icon name={MEDAL[place - 1]} size={28} title={`${place}º lugar`} /> : <span className="font-bold text-lg">{place}º</span>}
     </span>
   );
 }
 
 /**
- * Today's duel ranking (wins in the XP duels of the day). `compact` shows the top 3 and the
+ * Today's duel ranking (trophies won and lost in the duels of the day). `compact` shows the top 3 and the
  * viewer's own place; the full version lists everyone and yesterday's podium.
  */
 export function DailyRanking({
@@ -45,9 +47,10 @@ export function DailyRanking({
   yesterday?: DailyPodium | null;
   compact?: boolean;
 }) {
-  const ranked = rows.filter((r) => r.wins > 0 || r.duels > 0);
+  const ranked = rows.filter((r) => r.duels > 0);
   const mine = ranked.find((r) => r.profile_id === meId);
   const shown = compact ? ranked.slice(0, 3) : ranked;
+  const mineListed = !!mine && shown.includes(mine);
   const hasPrize = prizes.some((p) => p > 0);
 
   return (
@@ -78,13 +81,15 @@ export function DailyRanking({
       )}
 
       {ranked.length === 0 ? (
-        <p className="text-sm text-muted">Ninguém duelou hoje ainda. A primeira vitória já te coloca em 1º!</p>
+        <p className="text-sm text-muted">
+          Ninguém duelou hoje ainda. Todo mundo começa o dia com {GAME.duels.trophies.start} troféus!
+        </p>
       ) : (
         <ol className="grid gap-1.5">
           {shown.map((r) => (
-            <Row key={r.profile_id} row={r} person={people.get(r.profile_id)} me={r.profile_id === meId} prize={prizes[r.place - 1]} />
+            <Row key={r.profile_id} row={r} person={people.get(r.profile_id)} me={r.profile_id === meId} prize={r.qualified ? prizes[r.place - 1] : 0} />
           ))}
-          {compact && mine && mine.place > 3 && (
+          {compact && mine && !mineListed && (
             <>
               <li className="text-center text-muted leading-none">⋮</li>
               <Row row={mine} person={people.get(mine.profile_id)} me prize={0} />
@@ -95,15 +100,21 @@ export function DailyRanking({
 
       {compact ? (
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
-          {!mine && <span>Você ainda não pontuou hoje.</span>}
+          {!mine && meId && <span>Você ainda não duelou hoje.</span>}
+          {mine && !mine.qualified && (
+            <span>
+              Faltam {MIN_DUELS - mine.duels} {MIN_DUELS - mine.duels === 1 ? "duelo" : "duelos"} para você entrar no pódio.
+            </span>
+          )}
           <Link href="/ranking" className="underline ml-auto">
             Ver ranking completo →
           </Link>
         </div>
       ) : (
         <p className="text-xs text-muted">
-          Contam as vitórias de todos os duelos do dia, inclusive os amistosos (sem XP). Empate: fica na frente quem chegou
-          primeiro naquele número de vitórias.
+          Todo mundo começa o dia com {GAME.duels.trophies.start} troféus. Cada duelo que você inicia vale troféus (os
+          amistosos também): vencer quem tem mais troféus dá mais, perder para quem tem menos tira mais. Ser desafiado não
+          muda os seus troféus. Para entrar no pódio, faça pelo menos {MIN_DUELS} duelos no dia.
         </p>
       )}
 
@@ -118,7 +129,8 @@ export function DailyRanking({
                   <Icon name={MEDAL[p.place - 1]} size={22} />
                   {person && <PingoAvatar look={lookFromPingo(person.pingo)} gear={person.loadout} size={36} animated={false} shadow={false} />}
                   <span>
-                    <b>{person?.pingo?.name ?? person?.profile.display_name ?? "?"}</b> · {p.wins} {p.wins === 1 ? "vitória" : "vitórias"}
+                    <b>{person?.pingo?.name ?? person?.profile.display_name ?? "?"}</b> ·{" "}
+                    {p.trophies != null ? `${p.trophies} troféus` : `${p.wins} ${p.wins === 1 ? "vitória" : "vitórias"}`}
                     {p.prize > 0 && <span className="text-leaf font-bold"> +{p.prize}</span>}
                   </span>
                 </li>
@@ -133,8 +145,8 @@ export function DailyRanking({
 
 function Row({ row, person, me, prize }: { row: DailyRankingRow; person?: RankingPerson; me: boolean; prize: number }) {
   return (
-    <li className={`flex items-center gap-2 rounded-md px-2 py-1 ${me ? "bg-[#ffe3ef] ring-2 ring-bubble" : row.place === 1 ? "bg-[#fff6c9]" : ""}`}>
-      <Place place={row.place} />
+    <li className={`flex items-center gap-2 rounded-md px-2 py-1 ${me ? "bg-[#ffe3ef] ring-2 ring-bubble" : row.place === 1 && row.qualified ? "bg-[#fff6c9]" : ""}`}>
+      <Place place={row.place} qualified={row.qualified} />
       {person && <PingoAvatar look={lookFromPingo(person.pingo)} gear={person.loadout} size={40} animated={false} shadow={false} />}
       <span className="min-w-0 flex-1">
         <span className="font-bold block truncate">
@@ -145,11 +157,13 @@ function Row({ row, person, me, prize }: { row: DailyRankingRow; person?: Rankin
       </span>
       <span className="text-right shrink-0">
         <span className="font-pixel text-lg block leading-none">
-          <Icon name="trophy" /> {row.wins}
+          <Icon name="trophy" /> {row.trophies}
         </span>
         <span className="text-[11px] text-muted">
-          {row.duels} {row.duels === 1 ? "duelo" : "duelos"}
-          {prize > 0 && row.place <= 3 && <span className="text-leaf font-bold"> · +{prize}</span>}
+          {row.qualified
+            ? `${row.wins} ${row.wins === 1 ? "vitória" : "vitórias"} em ${row.duels}`
+            : `${row.duels}/${MIN_DUELS} duelos para o pódio`}
+          {prize > 0 && row.qualified && row.place <= 3 && <span className="text-leaf font-bold"> · +{prize}</span>}
         </span>
       </span>
     </li>

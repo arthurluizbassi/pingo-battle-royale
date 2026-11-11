@@ -20,6 +20,9 @@ export interface DuelOutcome {
   levelBefore: number;
   levelAfter: number;
   duelsToday: number;
+  /** trophies of the day, before and after this duel (every duel counts, friendly ones included) */
+  trophiesBefore: number;
+  trophiesAfter: number;
 }
 
 /** "YYYY-MM-DD" in the school's time zone (the daily limit resets at midnight in Brazil). */
@@ -98,6 +101,9 @@ export async function runDuel(userId: string, classId: string): Promise<DuelOutc
     p_daily_limit: GAME.duels.dailyXpDuels,
     p_min_interval_seconds: GAME.duels.minSecondsBetween,
     p_level_thresholds: LEVEL_THRESHOLDS,
+    p_trophy_start: GAME.duels.trophies.start,
+    p_trophy_k: GAME.duels.trophies.k,
+    p_trophy_scale: GAME.duels.trophies.scale,
   });
   if (error) throw new Error(error.message);
   const saved = data as {
@@ -109,6 +115,8 @@ export async function runDuel(userId: string, classId: string): Promise<DuelOutc
     level_before: number;
     level_after: number;
     duels_today: number;
+    trophies_before: number;
+    trophies_after: number;
   };
 
   return {
@@ -123,5 +131,7 @@ export async function runDuel(userId: string, classId: string): Promise<DuelOutc
     levelBefore: saved.level_before,
     levelAfter: saved.level_after,
     duelsToday: saved.duels_today,
+    trophiesBefore: saved.trophies_before,
+    trophiesAfter: saved.trophies_after,
   };
 }

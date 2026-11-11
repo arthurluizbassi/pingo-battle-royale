@@ -59,12 +59,15 @@ function DemoDailyRanking() {
       },
     ]),
   );
-  const wins = [9, 9, 7, 6, 5, 4, 3, 2, 1, 0];
-  const rows = wins.map((w, i) => ({ profile_id: roster[i].fighter.id, wins: w, duels: 12 - (i % 3), reached_at: null, place: i + 1 }));
+  const trophies = [1124, 1087, 1062, 1031, 1010, 996, 968, 941, 1060, 970];
+  const rows = trophies.map((t, i) => {
+    const duels = i < 8 ? 12 - (i % 3) : 10 - i; // the last two have not played enough for the podium
+    return { profile_id: roster[i].fighter.id, trophies: t, wins: Math.round(duels / 2 + (t - 1000) / 60), duels, reached_at: null, place: i + 1, qualified: i < 8 };
+  });
   const grid = (
     <div className="grid gap-5 lg:grid-cols-2">
       <DailyRanking rows={rows} people={people} meId={roster[5].fighter.id} prizes={[30, 20, 10]} resetsAt={new Date(Date.now() + 5 * 3600e3).toISOString()}
-        yesterday={{ class_id: "x", day: "2026-10-21", settled_at: "", podium: [0, 1, 2].map((i) => ({ profile_id: roster[i + 3].fighter.id, place: i + 1, wins: 10 - i * 2, prize: [30, 20, 10][i] })) }} />
+        yesterday={{ class_id: "x", day: "2026-10-21", settled_at: "", podium: [0, 1, 2].map((i) => ({ profile_id: roster[i + 3].fighter.id, place: i + 1, wins: 10 - i * 2, trophies: 1150 - i * 40, prize: [30, 20, 10][i] })) }} />
       <DailyRanking compact rows={rows} people={people} meId={roster[5].fighter.id} prizes={[30, 20, 10]} resetsAt={new Date(Date.now() + 5 * 3600e3).toISOString()} />
     </div>
   );

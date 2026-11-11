@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/Card";
+import { GAME } from "@/config/game";
 import { Ledger } from "@/components/ui/Ledger";
 import type { ProfileRow, TransactionRow } from "@/lib/db-types";
 import { createClient } from "@/lib/supabase/server";
@@ -50,8 +51,10 @@ export default async function CoinsPage() {
       <Card title="🥊 Ranking diário de duelos">
         <div className="grid gap-4">
           <p className="text-sm max-w-2xl">
-            Todo dia, à meia-noite (horário de Brasília), os 3 alunos com mais vitórias nos duelos do dia ganham as moedas abaixo.
-            Contam todos os duelos do dia, inclusive os amistosos (sem limite): quem joga mais pode ganhar. Empate fica com quem chegou primeiro naquele número de vitórias.
+            Todo dia, à meia-noite (horário de Brasília), os 3 alunos com mais troféus ganham as moedas abaixo. Todo mundo começa o
+            dia com {GAME.duels.trophies.start} troféus e ganha ou perde a cada duelo que inicia: vencer quem tem mais troféus vale
+            mais, perder para quem tem menos custa mais. Contam todos os duelos, inclusive os amistosos. Para entrar no pódio é
+            preciso fazer pelo menos {GAME.duels.trophies.minDuelsForPodium} duelos no dia.
           </p>
           <DailyPrizesForm prizes={prizes} />
           <DailyRanking rows={todayRanking} people={people} prizes={prizes} resetsAt={nextMidnightBrasilia()} />
@@ -64,10 +67,10 @@ export default async function CoinsPage() {
                 {podiums.map((d) => (
                   <li key={d.day} className="flex flex-wrap gap-x-3">
                     <b className="w-14">{d.day.split("-").reverse().slice(0, 2).join("/")}</b>
-                    {d.podium.length === 0 && <span className="text-muted">ninguém venceu duelos</span>}
+                    {d.podium.length === 0 && <span className="text-muted">ninguém entrou no pódio</span>}
                     {d.podium.map((p) => (
                       <span key={p.profile_id}>
-                        {p.place}º {people.get(p.profile_id)?.profile.display_name ?? "?"} ({p.wins} vit.)
+                        {p.place}º {people.get(p.profile_id)?.profile.display_name ?? "?"} ({p.trophies != null ? `${p.trophies} troféus` : `${p.wins} vit.`})
                         {p.prize > 0 && <span className="text-leaf font-bold"> +{p.prize}</span>}
                       </span>
                     ))}

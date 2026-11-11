@@ -10,6 +10,7 @@ import type { DuelController, DuelFighter } from "@/game/duel/DuelScene";
 import { isMuted, setMuted, sfx, unlock } from "@/game/duel/sfx";
 import type { DuelEntrant } from "@/lib/duel-roster";
 import { levelFromXp, levelProgress } from "@/lib/levels";
+import { trophyDelta } from "@/lib/trophies";
 import { findDuel } from "@/server/actions/duel";
 import { Icon } from "@/components/pixel/Icon";
 
@@ -25,6 +26,8 @@ interface DuelReport {
   levelBefore: number;
   levelAfter: number;
   duelsToday: number;
+  trophiesBefore: number;
+  trophiesAfter: number;
 }
 
 type Phase =
@@ -60,6 +63,8 @@ export function DuelExperience({
   const [phase, setPhase] = useState<Phase>({ name: "idle" });
   const [muted, setMutedState] = useState(false);
   const [demo, setDemo] = useState(initial);
+  // demo only: the classmates never play, so they all stay at the starting trophies
+  const [demoTrophies, setDemoTrophies] = useState<number>(GAME.duels.trophies.start);
   const started = useRef(false);
   const busy = useRef(false);
   const duelsToday = mode === "demo" ? demo.duelsToday : initial.duelsToday;
@@ -82,6 +87,8 @@ export function DuelExperience({
     const xpGained = counted ? (won ? GAME.duels.xpWin : GAME.duels.xpLoss) : 0;
     const xpAfter = demo.xp + xpGained;
     setDemo({ xp: xpAfter, duelsToday: demo.duelsToday + (counted ? 1 : 0) });
+    const trophiesAfter = demoTrophies + trophyDelta(demoTrophies, GAME.duels.trophies.start, won);
+    setDemoTrophies(trophiesAfter);
     return {
       foeId: foe.fighter.id,
       events: result.events,
@@ -93,8 +100,10 @@ export function DuelExperience({
       levelBefore: levelFromXp(demo.xp),
       levelAfter: levelFromXp(xpAfter),
       duelsToday: demo.duelsToday + (counted ? 1 : 0),
+      trophiesBefore: demoTrophies,
+      trophiesAfter,
     };
-  }, [classmates, me, demo]);
+  }, [classmates, me, demo, demoTrophies]);
 
   const findBattle = useCallback(async () => {
     if (busy.current) return;
@@ -497,6 +506,7 @@ function DuelResult({
   backHref: string;
 }) {
   const { won, xpBefore, xpGained } = report;
+  const trophyChange = report.trophiesAfter - report.trophiesBefore;
   const [shown, setShown] = useState(xpBefore);
   const bar = levelProgress(shown);
   const [leveledUp, setLeveledUp] = useState(false);
@@ -535,6 +545,14 @@ function DuelResult({
       <p className="text-sm">
         {won ? `${me.fighter.pingoName} venceu ${foe.fighter.pingoName}!` : `${foe.fighter.pingoName} venceu desta vez. Bora revanche?`}
       </p>
+      <p className="font-pixel text-2xl">
+        <Icon name="trophy" /> {report.trophiesAfter}{" "}
+        <span className={trophyChange > 0 ? "text-leaf" : "text-bubble"}>
+          {trophyChange >= 0 ? "+" : "−"}
+          {Math.abs(trophyChange)}
+        </span>
+        <span className="block font-sans text-xs text-muted">troféus de hoje</span>
+      </p>
       <div className="w-full">
         <div className="flex justify-between font-pixel">
           <span>Nível {bar.level}</span>
@@ -557,7 +575,7 @@ function DuelResult({
       )}
       {!report.counted && (
         <p className="text-sm pixel-inset bg-white px-2 py-1">
-          Você já fez {GAME.duels.dailyXpDuels} duelos com XP hoje. Este foi um amistoso, sem XP. Volte amanhã!
+          Você já fez {GAME.duels.dailyXpDuels} duelos com XP hoje. Este foi um amistoso: sem XP, mas os troféus continuam valendo.
         </p>
       )}
       <p className="text-xs text-muted">

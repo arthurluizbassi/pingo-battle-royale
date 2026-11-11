@@ -101,14 +101,14 @@ export async function getClassProgress(): Promise<Map<string, Progress>> {
   return new Map((data ?? []).map((row) => [row.owner_id, progressFromRow(row)]));
 }
 
-export type DuelListRow = Pick<DuelRow, "id" | "challenger_id" | "defender_id" | "winner_id" | "xp_gained" | "counted" | "created_at">;
+export type DuelListRow = Pick<DuelRow, "id" | "challenger_id" | "defender_id" | "winner_id" | "xp_gained" | "counted" | "trophy_delta" | "created_at">;
 
 /** Latest duels the student started or was challenged in. */
 export async function getMyDuels(profileId: string, limit = 12): Promise<DuelListRow[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("duels")
-    .select("id, challenger_id, defender_id, winner_id, xp_gained, counted, created_at")
+    .select("id, challenger_id, defender_id, winner_id, xp_gained, counted, trophy_delta, created_at")
     .or(`challenger_id.eq.${profileId},defender_id.eq.${profileId}`)
     .order("created_at", { ascending: false })
     .limit(limit)

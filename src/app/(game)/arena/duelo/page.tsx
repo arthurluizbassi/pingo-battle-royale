@@ -42,8 +42,7 @@ export default async function DuelPage({ searchParams }: { searchParams: Promise
           me={me}
           classmates={roster}
           autoStart={buscar !== undefined}
-          initial={{ xp: (progress.get(session.userId) ?? NEW_PROGRESS).xp, duelsToday }}
-        />
+          initial={{ xp: (progress.get(session.userId) ?? NEW_PROGRESS).xp, duelsToday }}        />
       )}
 
       <DailyRanking
@@ -72,6 +71,13 @@ export default async function DuelPage({ searchParams }: { searchParams: Promise
                     {iChallenged ? (
                       <>
                         Você desafiou <b>{other}</b>
+                        {d.trophy_delta != null && (
+                          <span className={`font-bold ${d.trophy_delta > 0 ? "text-leaf" : "text-muted"}`}>
+                            {" "}
+                            {d.trophy_delta > 0 ? "+" : "−"}
+                            {Math.abs(d.trophy_delta)} <Icon name="trophy" />
+                          </span>
+                        )}
                         {d.xp_gained > 0 && <span className="text-leaf font-bold"> +{d.xp_gained} XP</span>}
                       </>
                     ) : (

@@ -2,7 +2,10 @@ import "server-only";
 import type { DailyPodium, DailyRankingRow } from "@/lib/db-types";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { GAME } from "@/config/game";
 import { schoolDay } from "./duels";
+
+const RULES = { p_min_duels: GAME.duels.trophies.minDuelsForPodium, p_start: GAME.duels.trophies.start };
 
 /**
  * Pays the podium of every finished day that is still unpaid (the database does it once per day).
@@ -10,7 +13,7 @@ import { schoolDay } from "./duels";
  */
 export async function settlePendingRankings(classId: string): Promise<void> {
   try {
-    await createAdminClient().rpc("settle_pending_rankings", { p_class: classId });
+    await createAdminClient().rpc("settle_pending_rankings", { p_class: classId, ...RULES });
   } catch {
     // the next page load tries again
   }
@@ -19,7 +22,7 @@ export async function settlePendingRankings(classId: string): Promise<void> {
 /** Today's ranking of the user's class (RLS decides the class). */
 export async function getTodayRanking(): Promise<DailyRankingRow[]> {
   const supabase = await createClient();
-  const { data } = await supabase.rpc("daily_ranking");
+  const { data } = await supabase.rpc("daily_ranking", RULES);
   return (data as DailyRankingRow[] | null) ?? [];
 }
 

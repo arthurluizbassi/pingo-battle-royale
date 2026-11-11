@@ -53,6 +53,18 @@ export const GAME = {
     levelWidth: 5,
     maxPerOpponentPerDay: 2,
     avoidLastOpponents: 5,
+    /**
+     * Daily trophies (Clash-style, see GAME_BALANCE.md §12): everyone starts the day at `start`;
+     * a duel is worth `k` trophies, split by the trophy gap (`scale` = gap where the favourite
+     * is expected to win ~10 of 11). Only the challenger's trophies move. Floor: zero.
+     */
+    trophies: {
+      start: 1000,
+      k: 60,
+      scale: 400,
+      /** duels in the day needed to be on the podium (and get its coins) */
+      minDuelsForPodium: 5,
+    },
   },
 
   levels: {

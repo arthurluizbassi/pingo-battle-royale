@@ -44,16 +44,21 @@ export interface ClassRow {
 
 export interface DailyRankingRow {
   profile_id: string;
+  /** trophies of the day (everyone starts at GAME.duels.trophies.start) */
+  trophies: number;
   wins: number;
   duels: number;
   reached_at: string | null;
   place: number;
+  /** played enough duels today to be on the podium */
+  qualified: boolean;
 }
 
 export interface DailyPodium {
   class_id: string;
   day: string;
-  podium: Array<{ profile_id: string; place: number; wins: number; prize: number }>;
+  /** `trophies` is missing in days from before the trophy system (ranked by wins) */
+  podium: Array<{ profile_id: string; place: number; wins: number; trophies?: number; prize: number }>;
   settled_at: string;
 }
 
@@ -205,5 +210,7 @@ export interface DuelRow {
   events: BattleEvent[];
   xp_gained: number;
   counted: boolean;
+  /** trophies the challenger won or lost (null = before the trophy system) */
+  trophy_delta: number | null;
   created_at: string;
 }
